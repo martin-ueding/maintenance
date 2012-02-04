@@ -8,4 +8,4 @@ rm -fv "$HOME/.q3a/qkey"
 rm -fv "$HOME/.bzr.log"
 rm -fv "$HOME/.lesshst"
 rm -fv "$HOME/.mysql_history"
-find . -name ".unison.*" -print -delete
+find "$HOME" -name ".unison.*" -print -delete
