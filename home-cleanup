@@ -4,8 +4,8 @@
 set -e
 set -u
 
-rm -f "$HOME/.q3a/qkey"
-rm -f "$HOME/.bzr.log"
-rm -f "$HOME/.lesshst"
-rm -f "$HOME/.mysql_history"
-find . -name ".unison.*" -delete
+rm -fv "$HOME/.q3a/qkey"
+rm -fv "$HOME/.bzr.log"
+rm -fv "$HOME/.lesshst"
+rm -fv "$HOME/.mysql_history"
+find . -name ".unison.*" -print -delete
