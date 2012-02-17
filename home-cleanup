@@ -4,8 +4,23 @@
 set -e
 set -u
 
+# Clean up various files.
 rm -fv "$HOME/.q3a/qkey"
 rm -fv "$HOME/.bzr.log"
 rm -fv "$HOME/.lesshst"
 rm -fv "$HOME/.mysql_history"
+
+# Clean up old unison files.
 find "$HOME" -name ".unison.*" -print -delete
+
+# Compress all git repositories.
+current_dir=$(pwd)
+
+for git_dir in "$HOME/Branches/"*/.git/
+do
+	cd "$git_dir"
+	cd ..
+	echo "Cleaning $(basename "$(pwd)")"
+	git gc
+	cd "$current_dir"
+done
