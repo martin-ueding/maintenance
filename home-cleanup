@@ -4,6 +4,8 @@
 set -e
 set -u
 
+shopt -s globstar
+
 # Clean up various files.
 rm -fv "$HOME/.q3a/qkey"
 rm -fv "$HOME/.bzr.log"
@@ -16,11 +18,11 @@ find "$HOME" -name ".unison.*" -print -delete
 # Compress all git repositories.
 current_dir=$(pwd)
 
-for git_dir in "$HOME/Branches/"*/.git/
+for git_dir in "$HOME/Branches/"**/.git/
 do
 	cd "$git_dir"
 	cd ..
-	echo "Cleaning $(basename "$(pwd)")"
+	echo "---> Cleaning $(pwd) <---"
 	git gc
 	cd "$current_dir"
 done
