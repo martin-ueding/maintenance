@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2011 Martin Ueding <dev@martin-ueding.de>
+# Copyright (c) 2011-2012 Martin Ueding <dev@martin-ueding.de>
 
 set -e
 set -u
@@ -8,7 +8,6 @@ shopt -s globstar
 
 # Clean up various files.
 rm -fv "$HOME/.q3a/qkey"
-rm -fv "$HOME/.bzr.log"
 rm -fv "$HOME/.lesshst"
 rm -fv "$HOME/.mysql_history"
 
