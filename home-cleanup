@@ -14,6 +14,8 @@ rm -fv "$HOME/.mysql_history"
 # Clean up old unison files.
 find "$HOME" -name ".unison.*" -print -delete
 
+exit
+
 # Compress all git repositories.
 current_dir=$(pwd)
 
