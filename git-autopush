@@ -17,7 +17,7 @@ do
 
 	for remote in github chaos
 	do
-		if git remote | grep "$remote"
+		if git remote | grep "$remote" > /dev/null
 		then
 			git push "$remote" --mirror
 		fi
