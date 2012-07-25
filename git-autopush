@@ -19,7 +19,9 @@ do
 	do
 		if git remote | grep "$remote" > /dev/null
 		then
-			git push "$remote" --mirror
+			git push "$remote" --mirror &
 		fi
 	done
+
+	wait
 done
