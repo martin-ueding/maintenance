@@ -1,0 +1,25 @@
+#!/bin/bash
+# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+
+set -e
+set -u
+
+cwd="$(pwd)"
+
+for project in */
+do
+	cd "$cwd/$project"
+
+	if [[ ! -d .git ]]
+	then
+		continue
+	fi
+
+	for remote in github chaos
+	do
+		if git remote | grep "$remote"
+		then
+			git push "$remote" --mirror
+		fi
+	done
+done
