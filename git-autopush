@@ -19,7 +19,12 @@ do
 	do
 		if git remote | grep "$remote" > /dev/null
 		then
-			git push "$remote" --mirror &
+			# Check whether this remote needs to be pushed.
+			lines="$(git log --oneline "$remote/master..master" | wc -l)"
+			if (( lines > 0 ))
+			then
+				git push "$remote" --mirror &
+			fi
 		fi
 	done
 
