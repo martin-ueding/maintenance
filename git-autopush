@@ -17,6 +17,7 @@ do
 
 	for remote in github chaos
 	do
+		# Check if this is an actual remote.
 		if git remote | grep "$remote" > /dev/null
 		then
 			# Check whether this remote needs to be pushed.
