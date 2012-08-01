@@ -6,8 +6,17 @@ set -u
 
 cwd="$(pwd)"
 
-for project in */
+if [[ -z "${1:-}" ]]
+then
+	projects=( */ )
+else
+	projects=( "$@" )
+fi
+
+for project in "${projects[@]}"
 do
+	echo "$project"
+	continue
 	cd "$cwd/$project"
 
 	if [[ ! -d .git ]]
