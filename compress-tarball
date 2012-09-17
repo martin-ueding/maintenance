@@ -24,7 +24,7 @@
 set -e
 set -u
 
-tmpdir=/tmp/git-compress-tarball
+tmpdir="$(mktemp -d)"
 
 mkdir -p "$tmpdir"
 
