@@ -1,0 +1,43 @@
+#!/bin/bash
+# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+
+set -e
+set -u
+
+tmpdir=/tmp/git-compress-tarball
+
+mkdir -p "$tmpdir"
+
+for tarball
+do
+	if type boxes &> /dev/null
+	then
+		echo "$tarball" | boxes -a c -s 79 -d shell
+	fi
+
+	tar -xzf "$tarball" -C "$tmpdir"
+
+	pushd "$tmpdir"
+
+	pushd "${tarball%.tar.gz}"
+
+	if git gc --aggressive
+	then
+		echo "Ran git gc"
+	fi
+
+	if make clean
+	then
+		echo "Ran make clean"
+	fi
+
+	popd
+
+	tar -czf "$tarball" "${tarball%.tar.gz}"
+
+	rm -rf "${tarball%.tar.gz}"
+
+	popd
+
+	mv "$tmpdir/$tarball" .
+done
