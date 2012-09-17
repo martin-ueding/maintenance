@@ -19,7 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# This script takes a number
+# This script takes a number of tar archive which extract to a single directory,
+# which is the name of the tarball itself (without the ``.tar.gz`` though).
+# Then it will run ``git gc`` and ``make clean`` to remove all unneeded files
+# and make the tar archive as small as possible.
 
 set -e
 set -u
