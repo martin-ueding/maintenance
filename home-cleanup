@@ -15,14 +15,12 @@ rm -fv "$HOME/.mysql_history"
 find "$HOME" -name ".unison.*" -print -delete
 find "$HOME" -name "octave-core" -print -delete
 
-# Compress all git repositories.
-current_dir=$(pwd)
-
 for git_dir in "$HOME/Branches/"**/.git/
 do
-	cd "$git_dir"
-	cd ..
+	pushd "$git_dir"
+	pushd ..
 	echo "---> Cleaning $(pwd) <---"
 	git gc
-	cd "$current_dir"
+	popd
+	popd
 done
