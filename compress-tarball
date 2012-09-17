@@ -61,3 +61,5 @@ do
 
 	mv "$tmpdir/$tarball" .
 done
+
+rm -rf "$tmpdir"
