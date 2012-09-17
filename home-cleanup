@@ -15,8 +15,6 @@ rm -fv "$HOME/.mysql_history"
 find "$HOME" -name ".unison.*" -print -delete
 find "$HOME" -name "octave-core" -print -delete
 
-exit
-
 # Compress all git repositories.
 current_dir=$(pwd)
 
