@@ -13,6 +13,7 @@ rm -fv "$HOME/.mysql_history"
 
 # Clean up old unison files.
 find "$HOME" -name ".unison.*" -print -delete
+find "$HOME" -name "octave-core" -print -delete
 
 exit
 
