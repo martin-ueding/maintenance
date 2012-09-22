@@ -1,0 +1,5 @@
+# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+
+SHELL=/bin/bash
+
+@weekly       nice updatedb
