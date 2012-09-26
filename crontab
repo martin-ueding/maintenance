@@ -11,6 +11,3 @@ SHELL=/bin/bash
 @reboot       nice rm -fv "$HOME/.q3a/qkey"
 @monthly      nice find "$HOME" -name "octave-core" -print -delete
 @monthly      nice find "$HOME" -name ".unison.*" -print -delete
-
-# Virus scan.
-0 18 1 */3 *  nice clamscan -r "$HOME" &> "$HOME/TODO/Virus Scan $(date --rfc-3339=seconds).log"
