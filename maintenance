@@ -44,6 +44,9 @@ def main():
         # Automatic modus.
         for periodic in ["daily", "weekly", "monthly", "quarterly"]:
             for task in os.listdir(periodic):
+                if task.startswith("."):
+                    continue
+
                 command = os.path.join(periodic, task)
 
                 needs = True
