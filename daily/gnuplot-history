@@ -4,4 +4,4 @@
 set -e
 set -u
 
-
+rm -fv "$HOME/.gnuplot_history"
