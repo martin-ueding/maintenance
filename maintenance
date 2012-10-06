@@ -71,6 +71,8 @@ def main():
         # Do what the user told.
         for periodic in options.periodics:
             for task in os.listdir(periodic):
+                if task.startswith("."):
+                    continue
                 command = os.path.join(periodic, task)
                 perform(command, options.dry, data)
 
