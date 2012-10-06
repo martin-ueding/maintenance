@@ -1,0 +1,68 @@
+#!/bin/bash
+# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+# This script takes a number of tar archive which extract to a single directory,
+# which is the name of the tarball itself (without the ``.tar.gz`` though).
+# Then it will run ``git gc`` and ``make clean`` to remove all unneeded files
+# and make the tar archive as small as possible.
+
+set -e
+set -u
+
+tmpdir="$(mktemp -d)"
+
+mkdir -p "$tmpdir"
+
+for tarball
+do
+	if type boxes &> /dev/null
+	then
+		echo "$tarball" | boxes -a c -s 79 -d shell
+	fi
+
+	tar -xzf "$tarball" -C "$tmpdir"
+
+	pushd "$tmpdir"
+
+	pushd "${tarball%.tar.gz}"
+
+	if git gc --aggressive
+	then
+		echo "Ran git gc"
+	fi
+
+	if make clean
+	then
+		echo "Ran make clean"
+	fi
+
+	popd
+
+	tar -czf "$tarball" "${tarball%.tar.gz}"
+
+	rm -rf "${tarball%.tar.gz}"
+
+	popd
+
+	mv "$tmpdir/$tarball" .
+done
+
+rm -rf "$tmpdir"
