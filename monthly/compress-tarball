@@ -31,6 +31,8 @@ tmpdir="$(mktemp -d)"
 
 mkdir -p "$tmpdir"
 
+cd "$HOME/Branches"
+
 for tarball
 do
 	if type boxes &> /dev/null
