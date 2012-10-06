@@ -33,7 +33,7 @@ mkdir -p "$tmpdir"
 
 cd "$HOME/Branches"
 
-for tarball
+for tarball in *.tar.gz
 do
 	if type boxes &> /dev/null
 	then
