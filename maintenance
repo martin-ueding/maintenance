@@ -1,7 +1,91 @@
-#!/bin/bash
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
 
-set -e
-set -u
+import argparse
+import datetime
+import json
+import os
+import dateutil.parser
+import subprocess
+import os.path
+import glob
+
+__docformat__ = "restructuredtext en"
+
+data = {}
+
+def perform(command, dry):
+    print command.center(80)
+    print ("="*len(command)).center(80)
+    if not dry:
+        try:
+            subprocess.check_call([command])
+        except subprocess.CalledProcessError as e:
+            print e
+        else:
+            if not command in data:
+                data[command] = {}
+
+            data[command]["last"] = str(datetime.datetime.now())
+
+def main():
+    options = _parse_args()
+
+    statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 
 
+    if os.path.isfile(statusfile):
+        with open(statusfile) as f:
+            data = json.load(f)
+
+    if len(options.periodics) == 0:
+        # Automatic modus.
+        for periodic in ["daily", "weekly", "monthly", "quarterly"]:
+            for task in os.listdir(periodic):
+                command = os.path.join(periodic, task)
+
+                needs = True
+
+                if command in data:
+                    diff = datetime.datetime.now() - dateutil.parser.parse(data[command]["last"])
+                    if periodic == "daily" and diff < datetime.timedelta(1):
+                        needs = False
+                    elif periodic == "weekly" and diff < datetime.timedelta(7):
+                        needs = False
+                    elif periodic == "monthly" and diff < datetime.timedelta(30):
+                        needs = False
+                    elif periodic == "quarterly" and diff < datetime.timedelta(90):
+                        needs = False
+
+                if not needs:
+                    continue
+
+                perform(command, options.dry)
+
+    else:
+        # Do what the user told.
+        for periodic in options.periodics:
+            for task in os.listdir(periodic):
+                command = os.path.join(periodic, task)
+                perform(command, options.dry)
+
+    with open(statusfile, "w") as f:
+        json.dump(data, f, indent=4, sort_keys=True)
+
+def _parse_args():
+    """
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    """
+    parser = argparse.ArgumentParser(description="Runs periodic tasks and logs that they are done.")
+    parser.add_argument("periodics", metavar="periodics", type=str, nargs="*", help="If any of these are specified, overrides the automatic selection. Possible values: daily, weekly, monthly, quarterly")
+    parser.add_argument("-n", action="store_true", dest="dry", default=False, help="Dry run, only show what would be done.")
+
+    return parser.parse_args()
+
+if __name__ == "__main__":
+    main()
