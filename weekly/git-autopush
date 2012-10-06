@@ -13,6 +13,7 @@ do
 
 	if [[ ! -d .git ]]
 	then
+		popd
 		continue
 	fi
 
