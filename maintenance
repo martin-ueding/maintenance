@@ -14,9 +14,8 @@ import glob
 
 __docformat__ = "restructuredtext en"
 
-data = {}
 
-def perform(command, dry):
+def perform(command, dry, data):
     print command.center(80)
     print ("="*len(command)).center(80)
     if not dry:
@@ -36,6 +35,7 @@ def main():
 
     statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 
+    data = {}
 
     if os.path.isfile(statusfile):
         with open(statusfile) as f:
@@ -66,14 +66,14 @@ def main():
                 if not needs:
                     continue
 
-                perform(command, options.dry)
+                perform(command, options.dry, data)
 
     else:
         # Do what the user told.
         for periodic in options.periodics:
             for task in os.listdir(periodic):
                 command = os.path.join(periodic, task)
-                perform(command, options.dry)
+                perform(command, options.dry, data)
 
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
