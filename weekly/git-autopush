@@ -4,19 +4,12 @@
 set -e
 set -u
 
-cwd="$(pwd)"
+cd "$HOME/Branches"
 
-if [[ -z "${1:-}" ]]
-then
-	projects=( */ )
-else
-	projects=( "$@" )
-fi
-
-for project in "${projects[@]}"
+for project in ./*/
 do
 	echo "$project"
-	cd "$cwd/$project"
+	pushd "$project"
 
 	if [[ ! -d .git ]]
 	then
@@ -37,5 +30,6 @@ do
 		fi
 	done
 
+	popd
 	wait
 done
