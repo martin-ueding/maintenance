@@ -29,6 +29,7 @@ def perform(command, dry):
                 data[command] = {}
 
             data[command]["last"] = str(datetime.datetime.now())
+    print
 
 def main():
     options = _parse_args()
