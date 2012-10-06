@@ -9,7 +9,7 @@ cd "$HOME/Branches"
 for project in ./*/
 do
 	echo "$project"
-	pushd "$project"
+	pushd "$project" > /dev/null
 
 	if [[ ! -d .git ]]
 	then
@@ -30,6 +30,6 @@ do
 		fi
 	done
 
-	popd
 	wait
+	popd > /dev/null
 done
