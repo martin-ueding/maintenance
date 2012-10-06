@@ -5,12 +5,12 @@
 
 import argparse
 import datetime
+import dateutil.parser
+import glob
 import json
 import os
-import dateutil.parser
-import subprocess
 import os.path
-import glob
+import subprocess
 
 __docformat__ = "restructuredtext en"
 
