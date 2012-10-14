@@ -26,7 +26,7 @@ def perform(command, dry, data):
             if not command in data:
                 data[command] = {}
 
-            data[command]["last"] = str(datetime.datetime.now())
+            data[command.split('/')[-1]]["last"] = str(datetime.datetime.now())
     print
 
 def main():
@@ -51,8 +51,8 @@ def main():
 
                 needs = True
 
-                if command in data:
-                    diff = datetime.datetime.now() - dateutil.parser.parse(data[command]["last"])
+                if task in data:
+                    diff = datetime.datetime.now() - dateutil.parser.parse(data[task]["last"])
                     if periodic == "daily" and diff < datetime.timedelta(1):
                         needs = False
                     elif periodic == "weekly" and diff < datetime.timedelta(7):
