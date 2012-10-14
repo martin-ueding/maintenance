@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir "$HOME/Downloads" &> "$HOME/TODO/Virus Scan Downloads $(date --rfc-3339=seconds).log"
+clamscan -ir "$HOME/Downloads"

@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir "$HOME/PDF_Source" &> "$HOME/TODO/Virus Scan PDF_Source $(date --rfc-3339=seconds).log"
+clamscan -ir "$HOME/PDF_Source"

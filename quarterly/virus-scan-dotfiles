@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir ~/.??* &> "$HOME/TODO/Virus Scan Dotfiles $(date --rfc-3339=seconds).log"
+clamscan -ir ~/.??*

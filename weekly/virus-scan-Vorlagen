@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir "$HOME/Vorlagen" &> "$HOME/TODO/Virus Scan Vorlagen $(date --rfc-3339=seconds).log"
+clamscan -ir "$HOME/Vorlagen"

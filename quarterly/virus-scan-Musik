@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir "$HOME/Musik" &> "$HOME/TODO/Virus Scan Musik $(date --rfc-3339=seconds).log"
+clamscan -ir "$HOME/Musik"

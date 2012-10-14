@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir "$HOME/Bilder" &> "$HOME/TODO/Virus Scan Bilder $(date --rfc-3339=seconds).log"
+clamscan -ir "$HOME/Bilder"

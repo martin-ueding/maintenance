@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir "$HOME/Backup" &> "$HOME/TODO/Virus Scan Backup $(date --rfc-3339=seconds).log"
+clamscan -ir "$HOME/Backup"

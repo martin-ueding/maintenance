@@ -4,4 +4,4 @@
 set -e
 set -u
 
-clamscan -ir "$HOME/VM_share" &> "$HOME/TODO/Virus Scan VM_share $(date --rfc-3339=seconds).log"
+clamscan -ir "$HOME/VM_share"
