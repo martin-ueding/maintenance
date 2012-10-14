@@ -42,7 +42,7 @@ def main():
 
     if len(options.periodics) == 0:
         # Automatic modus.
-        for periodic in ["daily", "weekly", "monthly", "quarterly"]:
+        for periodic in ["daily", "weekly", "monthly", "quarterly", "annually"]:
             for task in os.listdir(periodic):
                 if task.startswith("."):
                     continue
@@ -60,6 +60,8 @@ def main():
                     elif periodic == "monthly" and diff < datetime.timedelta(30):
                         needs = False
                     elif periodic == "quarterly" and diff < datetime.timedelta(90):
+                        needs = False
+                    elif periodic == "annually" and diff < datetime.timedelta(360):
                         needs = False
 
                 if not needs:
