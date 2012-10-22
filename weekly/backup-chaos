@@ -6,7 +6,7 @@ set -u
 
 cd "$HOME"
 
-rsync -avE --delete Branches chaos:
+rsync -aEhv --delete Branches chaos:
 
 if type backup-status &> /dev/null
 then
