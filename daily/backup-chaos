@@ -4,9 +4,15 @@
 set -e
 set -u
 
+shopt -s extglob
+
 cd "$HOME"
 
-rsync -aEhv --delete Branches chaos:
+rsync="rsync -aEhv --delete"
+target="chaos"
+
+$rsync Branches "$target:"
+$rsync Dokumente/Studium/*+([0-9]) "$target:Dokumente/Studium/"
 
 if type backup-status &> /dev/null
 then
