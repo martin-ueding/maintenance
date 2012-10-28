@@ -1,8 +1,21 @@
 #!/bin/bash
 # Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
 
+# Goes through the ``~/Branches`` folder and checks for the given remotes
+# whether they need to be pushed.
+
 set -e
 set -u
+
+###############################################################################
+#                                  settings                                   #
+###############################################################################
+
+folder="$HOME/Branches"
+
+remotes=( github chaos )
+
+###############################################################################
 
 if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
 then
@@ -25,7 +38,7 @@ else
 	reset=
 fi
 
-cd "$HOME/Branches"
+cd "$folder"
 
 for project in ./*/
 do
@@ -37,7 +50,7 @@ do
 		continue
 	fi
 
-	for remote in github chaos
+	for remote in "${remotes[@]}"
 	do
 		# Check if this is an actual remote.
 		if git remote | grep "$remote" > /dev/null
@@ -49,7 +62,7 @@ do
 				echo -e "${orange}DIRTY${reset}\t$remote\t $project"
 				git push "$remote" --mirror &
 			else
-				echo -e "${green}OK${reset}\t $project"
+				echo -e "${green}OK${reset}\t$remote\t $project"
 			fi
 		fi
 	done
