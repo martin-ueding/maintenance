@@ -52,6 +52,9 @@ do
 		continue
 	fi
 
+	foldername=${project#./}
+	foldername=${foldername%/}
+
 	for remote in "${remotes[@]}"
 	do
 		# Check if this is an actual remote.
@@ -61,10 +64,10 @@ do
 			lines="$(git log --oneline "$remote/master..master" | wc -l)"
 			if (( lines > 0 ))
 			then
-				echo -e "${orange}DIRTY${reset}\t$remote\t $project"
+				echo -e "${orange}DIRTY${reset}\t$remote\t $foldername"
 				git push "$remote" --mirror &
 			else
-				echo -e "${green}OK${reset}\t$remote\t $project"
+				echo -e "${green}OK${reset}\t$remote\t $foldername"
 			fi
 		fi
 	done
