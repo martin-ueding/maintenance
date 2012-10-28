@@ -17,6 +17,7 @@ remotes=( github chaos )
 
 ###############################################################################
 
+# Gather color codes using ``tput``.
 if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
 then
 	bold="$(tput bold)"
@@ -44,6 +45,7 @@ for project in ./*/
 do
 	pushd "$project" > /dev/null
 
+	# Skip non git repositories.
 	if [[ ! -d .git ]]
 	then
 		popd > /dev/null
