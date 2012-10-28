@@ -4,7 +4,7 @@
 set -e
 set -u
 
-	if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null
+	if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
 	then
 		bold="$(tput bold)"
 
@@ -49,7 +49,7 @@ do
 				echo -e "${orange}DIRTY${reset}\t$remote\t $project"
 				git push "$remote" --mirror &
 			else
-				echo -e "${green}OK${reset}\t$remote\t $project"
+				echo -e "${green}OK${reset}\t $project"
 			fi
 		fi
 	done
