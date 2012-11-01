@@ -14,7 +14,7 @@ import subprocess
 
 __docformat__ = "restructuredtext en"
 
-def perform(command, dry, data):
+def perform(command, dry, data, statusfile):
     print command.center(80)
     print ("="*len(command)).center(80)
     if not dry:
@@ -28,7 +28,10 @@ def perform(command, dry, data):
                 data[task] = {}
 
             data[task]["last"] = str(datetime.datetime.now())
+
+            save_data(data, statusfile)
     print
+
 
 def main():
     options = _parse_args()
@@ -68,7 +71,7 @@ def main():
                 if not needs:
                     continue
 
-                perform(command, options.dry, data)
+                perform(command, options.dry, data, statusfile)
 
     else:
         # Do what the user told.
@@ -77,8 +80,9 @@ def main():
                 if task.startswith("."):
                     continue
                 command = os.path.join(periodic, task)
-                perform(command, options.dry, data)
+                perform(command, options.dry, data, statusfile)
 
+def save_data(statusfile, data):
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
 
