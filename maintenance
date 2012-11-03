@@ -20,7 +20,7 @@ class Colorcodes(object):
     utility. That way, they are portable. If there occurs any error with
     ``tput``, all codes are initialized as an empty string.
 
-    The provides fields are listed below.
+    The provided fields are listed below.
 
     Control:
 
