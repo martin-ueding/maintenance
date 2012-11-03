@@ -63,6 +63,7 @@ def perform(command, dry, data, statusfile):
         try:
             subprocess.check_call([command])
         except subprocess.CalledProcessError as e:
+            print _c.red + "Error in {command}:".format(command=command) + _c.reset
             print e
         else:
             task = command.split('/')[-1]
