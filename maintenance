@@ -33,6 +33,8 @@ class Colorcodes(object):
     - green
     - orange
     - red
+
+    :license: MIT
     """
     def __init__(self):
         try:
