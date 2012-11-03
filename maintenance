@@ -29,7 +29,7 @@ def perform(command, dry, data, statusfile):
 
             data[task]["last"] = str(datetime.datetime.now())
 
-            save_data(data, statusfile)
+            save_data(statusfile, data)
     print
 
 
@@ -83,6 +83,8 @@ def main():
                 perform(command, options.dry, data, statusfile)
 
 def save_data(statusfile, data):
+    assert isinstance(statusfile, str)
+    assert isinstance(data, dict)
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
 
