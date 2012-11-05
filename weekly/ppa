@@ -1,0 +1,64 @@
+#!/bin/bash
+# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+
+# Builds the latest package using ``debuild -S`` and upload them to the
+# ``stable`` PPA on Launchpad.
+
+set -e
+set -u
+
+cd "$HOME/Packaging"
+
+packages=(
+
+a4-scan
+copyright-updater
+email-rename
+git-changelog
+git-tarball
+jscribble
+latex-edit
+legacy-file-formats
+mp3-packer
+multiimage
+pdflatex-multifont
+project-ubernahme
+risk-auto-dice
+think-rotate
+unwrap-pdf-to-jpeg
+van-allen-sim-3d
+vim-headings
+xournal-page-count
+
+)
+
+for package in "${packages[@]}"
+do
+	pushd "$package" > /dev/null
+	latest_dir="$(shopt -s nullglob && echo */ | sed 's/ /\n/g' | grep -v 'orig/$' | sort -V | tail -n1)"
+	latest="$(shopt -s nullglob && echo *.dsc | sed 's/ /\n/g' | grep -v 'orig/$' | sort -V | tail -n1)"
+
+	latest_dir="${latest_dir%/}"
+
+	if [[ -n "$latest" ]]
+	then
+		echo "$package - $latest"
+
+		if [[ -f "${latest/.dsc/_source.changes}" ]]
+		then
+			echo "Build exists"
+			if ! dput stable "${latest/.dsc/_source.changes}"
+			then
+				echo "Upload failed."
+			fi
+		else
+			if (cd "$latest_dir" && debuild -S)
+			then
+				dput stable "${latest/.dsc/_source.changes}"
+			fi
+		fi
+
+	fi
+
+	popd > /dev/null
+done
