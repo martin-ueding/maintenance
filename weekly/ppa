@@ -32,6 +32,35 @@ xournal-page-count
 
 )
 
+# Gather color codes using ``tput``.
+if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
+then
+	bold="$(tput bold)"
+
+	black="$(tput setaf 0)"
+	blue="$(tput setaf 4)"
+	cyan="$(tput setaf 6)"
+	green="$(tput setaf 2)"
+	orange="$(tput setaf 3)"
+	purple="$(tput setaf 5)"
+	red="$(tput setaf 1)"
+	white="$(tput setaf 7)"
+
+	reset="$(tput sgr0)"
+else
+	bold=
+
+	blue=
+	cyan=
+	green=
+	orange=
+	purple=
+	red=
+	white=
+
+	reset=
+fi
+
 for package in "${packages[@]}"
 do
 	pushd "$package" > /dev/null
@@ -42,14 +71,14 @@ do
 
 	if [[ -n "$latest" ]]
 	then
-		echo "$package - $latest"
+		echo "${bold}${cyan}${package}${reset}"
 
 		if [[ -f "${latest/.dsc/_source.changes}" ]]
 		then
-			echo "Build exists"
+			echo "${green}Build exists${reset}"
 			if ! dput stable "${latest/.dsc/_source.changes}"
 			then
-				echo "Upload failed."
+				echo "${red}Upload failed.${reset}"
 			fi
 		else
 			if (cd "$latest_dir" && debuild -S)
