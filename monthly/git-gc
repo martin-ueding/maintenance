@@ -6,11 +6,33 @@ set -u
 
 shopt -s globstar
 
+# Gather color codes using ``tput``.
+if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
+then
+	bold="$(tput bold)"
+
+	blue="$(tput setaf 4)"
+	green="$(tput setaf 2)"
+	orange="$(tput setaf 3)"
+	red="$(tput setaf 1)"
+
+	reset="$(tput sgr0)"
+else
+	bold=
+
+	blue=
+	green=
+	orange=
+	red=
+
+	reset=
+fi
+
 for git_dir in "$HOME/Branches/"**/.git/
 do
 	pushd "$git_dir"
 	pushd ..
-	echo "---> Cleaning $(pwd) <---"
+	echo "${cyan}Cleaning $(pwd)${reset}"
 	git gc
 	popd
 	popd
