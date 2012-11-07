@@ -27,6 +27,9 @@ def perform(command, dry, data, statusfile):
         except subprocess.CalledProcessError as e:
             print _c.red + "Error in {command}:".format(command=command) + _c.reset
             print e
+        except OSError as e:
+            print _c.red + "Could not execute {command}.".format(command=command) + _c.reset
+            pass
         else:
             task = command.split('/')[-1]
             if not task in data:
