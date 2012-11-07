@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
@@ -45,7 +45,7 @@ def main():
     for package in _packages:
         os.chdir(basedir)
 
-        files = filter(lambda x: os.path.isfile(os.path.join(basedir, package, x)) and x.endswith(".dsc"), os.listdir(os.path.join(basedir, package)))
+        files = [x for x in os.listdir(os.path.join(basedir, package)) if os.path.isfile(os.path.join(basedir, package, x)) and x.endswith(".dsc")]
 
         if len(files) == 0:
             continue
@@ -54,7 +54,7 @@ def main():
 
         latest_dsc = files[-1]
 
-        files = filter(lambda x: os.path.isdir(os.path.join(basedir, package, x)) and not x.endswith(".orig"), os.listdir(os.path.join(basedir, package)))
+        files = [x for x in os.listdir(os.path.join(basedir, package)) if os.path.isdir(os.path.join(basedir, package, x)) and not x.endswith(".orig")]
 
         if len(files) == 0:
             continue
@@ -63,25 +63,25 @@ def main():
 
         latest_dir = files[-1]
 
-        print _c.cyan + latest_dir + _c.reset
+        print(_c.cyan + latest_dir + _c.reset)
 
         changes = latest_dsc[:-4]+"_source.changes"
 
         if os.path.isfile(os.path.join(basedir, package, changes)):
-            print _c.green + "Build exists" + _c.reset
+            print(_c.green + "Build exists" + _c.reset)
         else:
             try:
                 os.chdir(os.path.join(basedir, package, latest_dir))
                 subprocess.check_call(["debuild", "-S"])
             except subprocess.CalledProcessError as e:
-                print e
-                print _c.red + "Build failed." + _c.reset
+                print(e)
+                print(_c.red + "Build failed." + _c.reset)
         try:
             os.chdir(os.path.join(basedir, package))
             subprocess.check_call(["dput", "stable", changes])
         except subprocess.CalledProcessError as e:
-            print e
-            print _c.red + "Upload failed." + _c.reset
+            print(e)
+            print(_c.red + "Upload failed." + _c.reset)
 
 def _parse_args():
     """
