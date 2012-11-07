@@ -1,93 +1,101 @@
-#!/bin/bash
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 # Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
 
-# Builds the latest package using ``debuild -S`` and upload them to the
-# ``stable`` PPA on Launchpad.
+import argparse
+import apt
+import os
+import subprocess
 
-set -e
-set -u
+import colorcodes
 
-cd "$HOME/Packaging"
+__docformat__ = "restructuredtext en"
 
-packages=(
+_c = colorcodes.Colorcodes()
 
-a4-scan
-copyright-updater
-email-rename
-git-changelog
-git-tarball
-jscribble
-latex-edit
-legacy-file-formats
-mp3-packer
-multiimage
-pdflatex-multifont
-project-ubernahme
-risk-auto-dice
-think-rotate
-unwrap-pdf-to-jpeg
-van-allen-sim-3d
-vim-headings
-xournal-page-count
+_packages = [
 
-)
+"a4-scan",
+"copyright-updater",
+"email-rename",
+"git-changelog",
+"git-tarball",
+"jscribble",
+"latex-edit",
+"legacy-file-formats",
+"mp3-packer",
+"multiimage",
+"pdflatex-multifont",
+"project-ubernahme",
+"risk-auto-dice",
+"think-rotate",
+"unwrap-pdf-to-jpeg",
+"van-allen-sim-3d",
+"vim-headings",
+"xournal-page-count",
 
-# Gather color codes using ``tput``.
-if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
-then
-	bold="$(tput bold)"
+]
 
-	black="$(tput setaf 0)"
-	blue="$(tput setaf 4)"
-	cyan="$(tput setaf 6)"
-	green="$(tput setaf 2)"
-	orange="$(tput setaf 3)"
-	purple="$(tput setaf 5)"
-	red="$(tput setaf 1)"
-	white="$(tput setaf 7)"
+def main():
+    options = _parse_args()
 
-	reset="$(tput sgr0)"
-else
-	bold=
+    basedir = os.path.expanduser("~/Packaging")
 
-	blue=
-	cyan=
-	green=
-	orange=
-	purple=
-	red=
-	white=
+    for package in _packages:
+        os.chdir(basedir)
 
-	reset=
-fi
+        files = [x for x in os.listdir(os.path.join(basedir, package)) if os.path.isfile(os.path.join(basedir, package, x)) and x.endswith(".dsc")]
 
-for package in "${packages[@]}"
-do
-	pushd "$package" > /dev/null
-	latest_dir="$(shopt -s nullglob && echo */ | sed 's/ /\n/g' | grep -v 'orig/$' | sort -V | tail -n1)"
-	latest="$(shopt -s nullglob && echo *.dsc | sed 's/ /\n/g' | grep -v 'orig/$' | sort -V | tail -n1)"
+        if len(files) == 0:
+            continue
 
-	latest_dir="${latest_dir%/}"
+        files.sort(cmp=apt.VersionCompare)
 
-	if [[ -n "$latest" ]]
-	then
-		echo "${bold}${cyan}${package}${reset}"
+        latest_dsc = files[-1]
 
-		if [[ -f "${latest/.dsc/_source.changes}" ]]
-		then
-			echo "${green}Build exists${reset}"
-			if ! dput stable "${latest/.dsc/_source.changes}"
-			then
-				echo "${red}Upload failed.${reset}"
-			fi
-		else
-			if (cd "$latest_dir" && debuild -S)
-			then
-				dput stable "${latest/.dsc/_source.changes}"
-			fi
-		fi
+        files = [x for x in os.listdir(os.path.join(basedir, package)) if os.path.isdir(os.path.join(basedir, package, x)) and not x.endswith(".orig")]
 
-	fi
+        if len(files) == 0:
+            continue
 
-	popd > /dev/null
-done
+        files.sort(cmp=apt.VersionCompare)
+
+        latest_dir = files[-1]
+
+        print(_c.cyan + latest_dir + _c.reset)
+
+        changes = latest_dsc[:-4]+"_source.changes"
+
+        if os.path.isfile(os.path.join(basedir, package, changes)):
+            print(_c.green + "Build exists" + _c.reset)
+        else:
+            try:
+                os.chdir(os.path.join(basedir, package, latest_dir))
+                subprocess.check_call(["debuild", "-S"])
+            except subprocess.CalledProcessError as e:
+                print(e)
+                print(_c.red + "Build failed." + _c.reset)
+        try:
+            os.chdir(os.path.join(basedir, package))
+            subprocess.check_call(["dput", "stable", changes])
+        except subprocess.CalledProcessError as e:
+            print(e)
+            print(_c.red + "Upload failed." + _c.reset)
+
+def _parse_args():
+    """
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    """
+    parser = argparse.ArgumentParser(description="")
+    #parser.add_argument("args", metavar="N", type=str, nargs="*", help="Positional arguments.")
+    #parser.add_argument("", dest="", type="", default=, help=)
+    #parser.add_argument("--version", action="version", version="<the version>")
+
+    return parser.parse_args()
+
+if __name__ == "__main__":
+    main()
