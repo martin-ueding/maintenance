@@ -41,10 +41,11 @@ fi
 
 ###############################################################################
 
-cd "$folder"
+check-folder() {
+	local project foldername lines
 
-for project in ./*/
-do
+	project="$1"
+
 	pushd "$project" > /dev/null
 
 	# Skip non git repositories.
@@ -76,4 +77,11 @@ do
 
 	wait
 	popd > /dev/null
+}
+
+cd "$folder"
+
+for project in ./*/
+do
+	check-folder "$project"
 done
