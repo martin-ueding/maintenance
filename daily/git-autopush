@@ -11,7 +11,7 @@ set -u
 #                                  settings                                   #
 ###############################################################################
 
-folder="$HOME/Branches"
+folders=( ~/Branches/*/ ~/Dokumente/Studium/*/*/ )
 
 remotes=( github chaos )
 
@@ -79,9 +79,7 @@ check-folder() {
 	popd > /dev/null
 }
 
-cd "$folder"
-
-for project in ./*/
+for repo in "${folders[@]}"
 do
-	check-folder "$project"
+	check-folder "$repo"
 done
