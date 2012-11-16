@@ -11,7 +11,7 @@ set -u
 #                                  settings                                   #
 ###############################################################################
 
-folders=( ~/Branches/*/ ~/Dokumente/Studium/*/*/ )
+folders=( ~/Branches/*/ ~/Dokumente/Studium/*/*/ ~/.vim/bundle/*/ )
 
 remotes=( github chaos )
 
