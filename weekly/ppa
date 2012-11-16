@@ -37,51 +37,126 @@ _packages = [
 
 ]
 
+basedir = os.path.expanduser("~/Packaging")
+
+def export_latest(package):
+    """
+    Goes into the ``~/Branches`` folder and generates a tar archive with the
+    latest version.
+
+    Changes the current working directory.
+
+    :param package: Name of the project.
+    """
+    branchesdir = os.path.expanduser("~/Branches")
+
+    os.chdir(os.path.join(branchesdir, package))
+
+    latest = None
+
+    try:
+        output = subprocess.check_output(["git", "tarball"]).split()
+    except subprocess.CalledProcessError:
+        pass
+    else:
+        if len(output) > 0:
+            latest = output[-1]
+
+    return latest
+
+def get_latest_folder(package):
+    """
+    Retrieves the folder (without ``.orig``) which has the latest version
+    number. If there is no such folder, ``None`` is returned.
+    """
+    folders = [x for x in os.listdir(os.path.join(basedir, package))
+               if os.path.isdir(os.path.join(basedir, package, x))
+               and not x.endswith(".orig")]
+
+    if len(folders) == 0:
+        return None
+
+    folders.sort(cmp=apt.VersionCompare)
+
+    return folders[-1]
+
+def get_latest_dsc(package):
+    files = [x for x in os.listdir(os.path.join(basedir, package))
+             if os.path.isfile(os.path.join(basedir, package, x))
+             and x.endswith(".dsc")]
+
+    if len(files) == 0:
+        return None
+
+    files.sort(cmp=apt.VersionCompare)
+
+    return files[-1]
+
+def get_latest_changes(package):
+    files = [x for x in os.listdir(os.path.join(basedir, package))
+             if os.path.isfile(os.path.join(basedir, package, x))
+             and x.endswith("_source.changes")]
+
+    if len(files) == 0:
+        return None
+
+    files.sort(cmp=apt.VersionCompare)
+
+    return files[-1]
+
+def build(package, source=True):
+    changes = get_latest_dsc(package)[:-4]+"_source.changes"
+
+    if os.path.isfile(os.path.join(basedir, package, changes)):
+        print(_c.green + "Build exists" + _c.reset)
+    else:
+        try:
+            os.chdir(os.path.join(basedir, package, latest_dir))
+            subprocess.check_call(["debuild", "-S"])
+        except subprocess.CalledProcessError as e:
+            print(e)
+            print(_c.red + "Build failed." + _c.reset)
+
+def upload(package):
+    changes = get_latest_changes(package)
+    try:
+        os.chdir(os.path.join(basedir, package))
+        subprocess.check_call(["dput", "stable", changes])
+    except subprocess.CalledProcessError as e:
+        print(e)
+        print(_c.red + "Upload failed." + _c.reset)
+
+def uupdate(package):
+    latest_tar = export_latest(package)
+
+    if latest_tar is not None:
+        os.chdir(os.path.join(basedir, package, latest_folder))
+
+        try:
+            command = ["uupdate", "../"+'_'.join(latest_tar.rsplit('-', 1))]
+            subprocess.check_call(command)
+        except subprocess.CalledProcessError as e:
+            print e
+            pass
+
+def handle_package(package):
+    print(_c.cyan + package + _c.reset)
+
+    os.chdir(basedir)
+
+    export_latest(package)
+    uupdate(package)
+    build(package)
+    upload(package)
+
 def main():
     options = _parse_args()
 
-    basedir = os.path.expanduser("~/Packaging")
-
     for package in _packages:
-        os.chdir(basedir)
-
-        files = [x for x in os.listdir(os.path.join(basedir, package)) if os.path.isfile(os.path.join(basedir, package, x)) and x.endswith(".dsc")]
-
-        if len(files) == 0:
-            continue
-
-        files.sort(cmp=apt.VersionCompare)
-
-        latest_dsc = files[-1]
-
-        files = [x for x in os.listdir(os.path.join(basedir, package)) if os.path.isdir(os.path.join(basedir, package, x)) and not x.endswith(".orig")]
-
-        if len(files) == 0:
-            continue
-
-        files.sort(cmp=apt.VersionCompare)
-
-        latest_dir = files[-1]
-
-        print(_c.cyan + latest_dir + _c.reset)
-
-        changes = latest_dsc[:-4]+"_source.changes"
-
-        if os.path.isfile(os.path.join(basedir, package, changes)):
-            print(_c.green + "Build exists" + _c.reset)
-        else:
-            try:
-                os.chdir(os.path.join(basedir, package, latest_dir))
-                subprocess.check_call(["debuild", "-S"])
-            except subprocess.CalledProcessError as e:
-                print(e)
-                print(_c.red + "Build failed." + _c.reset)
         try:
-            os.chdir(os.path.join(basedir, package))
-            subprocess.check_call(["dput", "stable", changes])
-        except subprocess.CalledProcessError as e:
-            print(e)
-            print(_c.red + "Upload failed." + _c.reset)
+            handle_package(package)
+        except TypeError as e:
+            pass
 
 def _parse_args():
     """
