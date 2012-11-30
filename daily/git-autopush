@@ -41,6 +41,10 @@ fi
 
 ###############################################################################
 
+repo_count=0
+mirrored_count=0
+mirror_count=0
+
 check-folder() {
 	local project foldername lines
 
@@ -55,14 +59,28 @@ check-folder() {
 		continue
 	fi
 
+	# If we made it to here, count the repository.
+	repo_count=$(( repo_count + 1 ))
+
 	foldername=${project#./}
 	foldername=${foldername%/}
+
+	local is_counted=false
 
 	for remote in "${remotes[@]}"
 	do
 		# Check if this is an actual remote.
 		if git remote | grep "$remote" > /dev/null
 		then
+			# If we made it to here, count the mirror
+			mirror_count=$(( mirror_count + 1 ))
+
+			if [[ "$is_counted" = "false" ]]
+			then
+				is_counted=true
+				mirrored_count=$(( mirrored_count + 1 ))
+			fi
+
 			# Check whether this remote needs to be pushed.
 			lines="$(git log --oneline "$remote/master..master" | wc -l)"
 			if (( lines > 0 ))
@@ -82,3 +100,6 @@ for repo in "${folders[@]}"
 do
 	check-folder "$repo"
 done
+
+echo
+echo "There are $repo_count repos, $mirrored_count mirrored on $mirror_count mirrors."
