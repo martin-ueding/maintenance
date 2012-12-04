@@ -16,24 +16,25 @@ _c = colorcodes.Colorcodes()
 
 _packages = [
 
-"a4-scan",
-"copyright-updater",
-"email-rename",
-"git-changelog",
-"git-tarball",
-"jscribble",
-"latex-edit",
-"legacy-file-formats",
-"mp3-packer",
-"multiimage",
-"pdflatex-multifont",
-"project-ubernahme",
-"risk-auto-dice",
-"think-rotate",
-"unwrap-pdf-to-jpeg",
-"van-allen-sim-3d",
-"vim-headings",
-"xournal-page-count",
+    "a4-scan",
+    "copyright-updater",
+    "email-rename",
+    "git-changelog",
+    "git-tarball",
+    "jscribble",
+    "latex-edit",
+    "legacy-file-formats",
+    "mp3-packer",
+    "multiimage",
+    "pdflatex-multifont",
+    "project-ubernahme",
+    "risk-auto-dice",
+    "template-spawner",
+    "think-rotate",
+    "unwrap-pdf-to-jpeg",
+    "van-allen-sim-3d",
+    "vim-headings",
+    "xournal-page-count",
 
 ]
 
@@ -111,7 +112,7 @@ def build(package, source=True):
         print(_c.green + "Build exists" + _c.reset)
     else:
         try:
-            os.chdir(os.path.join(basedir, package, latest_dir))
+            os.chdir(os.path.join(basedir, package, get_latest_folder(package)))
             subprocess.check_call(["debuild", "-S"])
         except subprocess.CalledProcessError as e:
             print(e)
