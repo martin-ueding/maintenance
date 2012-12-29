@@ -40,6 +40,9 @@ _packages = [
 
 basedir = os.path.expanduser("~/Packaging")
 
+class PackagingError(Exception):
+    pass
+
 def export_latest(package):
     """
     Goes into the ``~/Branches`` folder and generates a tar archive with the
@@ -75,7 +78,7 @@ def get_latest_folder(package):
                and not x.endswith(".orig")]
 
     if len(folders) == 0:
-        return None
+        raise PackagingError("No latest folder found")
 
     folders.sort(cmp=apt.VersionCompare)
 
@@ -87,7 +90,7 @@ def get_latest_dsc(package):
              and x.endswith(".dsc")]
 
     if len(files) == 0:
-        return None
+        raise PackagingError("No latest *.dsc found")
 
     files.sort(cmp=apt.VersionCompare)
 
@@ -99,24 +102,33 @@ def get_latest_changes(package):
              and x.endswith("_source.changes")]
 
     if len(files) == 0:
-        return None
+        raise PackagingError("No latest *_source.changes found")
+
+    files.sort(cmp=apt.VersionCompare)
+
+    return files[-1]
+
+def get_latest_tar(package):
+    files = [x for x in os.listdir(os.path.join(basedir, package))
+             if os.path.isfile(os.path.join(basedir, package, x))
+             and x.endswith(".tar.gz")
+             and not x.endswith(".orig.tar.gz")
+             and not x.endswith(".debian.tar.gz")]
+
+    if len(files) == 0:
+        raise PackagingError("No latest *.tar.gz found")
 
     files.sort(cmp=apt.VersionCompare)
 
     return files[-1]
 
 def build(package, source=True):
-    changes = get_latest_dsc(package)[:-4]+"_source.changes"
-
-    if os.path.isfile(os.path.join(basedir, package, changes)):
-        print(_c.green + "Build exists" + _c.reset)
-    else:
-        try:
-            os.chdir(os.path.join(basedir, package, get_latest_folder(package)))
-            subprocess.check_call(["debuild", "-S"])
-        except subprocess.CalledProcessError as e:
-            print(e)
-            print(_c.red + "Build failed." + _c.reset)
+    try:
+        os.chdir(os.path.join(basedir, package, get_latest_folder(package)))
+        subprocess.check_call(["debuild", "-S"])
+    except subprocess.CalledProcessError as e:
+        print(e)
+        print(_c.red + "Build failed." + _c.reset)
 
 def upload(package):
     changes = get_latest_changes(package)
@@ -128,17 +140,17 @@ def upload(package):
         print(_c.red + "Upload failed." + _c.reset)
 
 def uupdate(package):
-    latest_tar = export_latest(package)
+    latest_tar = get_latest_tar(package)
+    latest_folder = get_latest_folder(package)
 
-    if latest_tar is not None:
-        os.chdir(os.path.join(basedir, package, latest_folder))
+    os.chdir(os.path.join(basedir, package, latest_folder))
 
-        try:
-            command = ["uupdate", "../"+'_'.join(latest_tar.rsplit('-', 1))]
-            subprocess.check_call(command)
-        except subprocess.CalledProcessError as e:
-            print e
-            pass
+    try:
+        command = ["uupdate", "../"+latest_tar]
+        subprocess.check_call(command)
+    except subprocess.CalledProcessError as e:
+        print e
+        pass
 
 def handle_package(package):
     print(_c.cyan + package + _c.reset)
@@ -156,8 +168,10 @@ def main():
     for package in _packages:
         try:
             handle_package(package)
-        except TypeError as e:
-            pass
+        except PackagingError as e:
+            print(e)
+            print(_c.red + "Packaging of {0} failed.".format(package) + _c.reset)
+
 
 def _parse_args():
     """
