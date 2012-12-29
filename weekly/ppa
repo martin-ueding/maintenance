@@ -161,6 +161,7 @@ def handle_package(package):
     uupdate(package)
     build(package)
     upload(package)
+    build(package, source=False)
 
 def main():
     options = _parse_args()
