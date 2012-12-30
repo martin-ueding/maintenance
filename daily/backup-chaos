@@ -13,6 +13,7 @@ target="chaos"
 
 $rsync Branches "$target:"
 $rsync Dokumente/Studium/*+([0-9]) "$target:Dokumente/Studium/"
+$rsync .vim "$target:Dokumente/Studium/"
 
 if type backup-status &> /dev/null
 then
