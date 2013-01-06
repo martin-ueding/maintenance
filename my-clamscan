@@ -14,14 +14,21 @@ logfile_dir="$HOME/TODO"
 logfile_name="clamscan-$scan_target_basename.txt"
 logfile_path="$logfile_dir/$logfile_name"
 
+cleanup() {
+	echo "Running cleanup hook"
+	rm -f "$logfile_path"
+}
+
+trap cleanup SIGINT
+
 echo "Scanning $@ and logging to $logfile_path"
 echo
 
 if clamscan -ir "$@" &> >(tee "$logfile_path")
 then
+	cleanup
 	echo
 	echo "Scanning was successful, deleting logfile"
-	rm -f "$logfile_path"
 else
 	echo
 	echo "There was some error. You need to look into that logfile"
