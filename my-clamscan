@@ -1,0 +1,29 @@
+#!/bin/bash
+# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+
+# This script will run ``clamscan`` and watch its exit code. Unless there is
+# some error (meaning a virus found or similar), the log file will be deleted
+# afterwards.
+
+set -e
+set -u
+
+scan_target="$1"
+scan_target_basename="${1##*/}"
+
+logfile_dir="$HOME/TODO"
+logfile_name="clamscan-$scan_target_basename.txt"
+logfile_path="$logfile_dir/$logfile_name"
+
+echo "Scanning $scan_target and logging to $logfile_path"
+echo
+
+if clamscan -ir "$scan_target" &> >(tee "$logfile_path")
+then
+	echo
+	echo "Scanning was successful, deleting logfile"
+	rm -f "$logfile_path"
+else
+	echo
+	echo "There was some error. You need to look into that logfile"
+fi
