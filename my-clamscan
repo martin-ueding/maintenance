@@ -24,7 +24,7 @@ trap cleanup SIGINT
 echo "Scanning $@ and logging to $logfile_path"
 echo
 
-if clamscan -ir "$@" &> >(tee "$logfile_path")
+if clamscan -r "$@" &> >(tee "$logfile_path")
 then
 	cleanup
 	echo
