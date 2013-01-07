@@ -4,4 +4,6 @@
 set -e
 set -u
 
-./my-clamscan ~/.??*
+shopt -s extglob
+
+./my-clamscan ~/.!(|.|VirtualBox)
