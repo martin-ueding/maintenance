@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
 set -e
 set -u
@@ -11,9 +11,9 @@ cd "$HOME"
 rsync="rsync -aEhv --delete"
 target="chaos"
 
+$rsync .vim "$target:"
 $rsync Branches "$target:"
 $rsync Dokumente/Studium/*+([0-9]) "$target:Dokumente/Studium/"
-$rsync .vim "$target:Dokumente/Studium/"
 
 if type backup-status &> /dev/null
 then
