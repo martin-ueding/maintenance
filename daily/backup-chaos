@@ -14,6 +14,7 @@ target="chaos"
 $rsync .vim "$target:"
 $rsync Branches "$target:"
 $rsync Dokumente/Studium/*+([0-9]) "$target:Dokumente/Studium/"
+$rsync Vorlagen "$target:"
 
 if type backup-status &> /dev/null
 then
