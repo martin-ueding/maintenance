@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
 # Goes through the ``~/Branches`` folder and checks for the given remotes
 # whether they need to be pushed.
@@ -11,7 +11,14 @@ set -u
 #                                  settings                                   #
 ###############################################################################
 
-folders=( ~/Branches/*/ ~/Dokumente/Studium/*/*/ ~/.vim/bundle/*/ )
+folders=(
+
+~/.vim/bundle/*/
+~/Branches/*/
+~/Dokumente/Studium/*/*/
+~/Vorlagen
+
+)
 
 remotes=( github chaos )
 
