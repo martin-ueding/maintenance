@@ -4,7 +4,7 @@
 set -e
 set -u
 
-shopt -s globstar
+shopt -s extglob
 
 # Gather color codes using ``tput``.
 if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
@@ -35,12 +35,13 @@ else
 	reset=
 fi
 
-find "$HOME/Branches" "$HOME/Dokumente" "$HOME/.vim" -type d -name .git | while read -r git_dir
+find "$HOME/"!(Bilder|Backup) -type d -name .git | sort | while read -r git_dir
 do
 	(
 	cd "$git_dir"
 	cd ..
 	echo "${cyan}Cleaning $(pwd)${reset}"
 	git gc
+	echo
 	)
 done
