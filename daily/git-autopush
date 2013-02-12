@@ -50,13 +50,12 @@ check-folder() {
 
 	project="$1"
 
-	pushd "$project" > /dev/null
+	cd "$project"
 
 	# Skip non git repositories.
 	if [[ ! -d .git ]]
 	then
-		popd > /dev/null
-		continue
+		exit 1
 	fi
 
 	# If we made it to here, count the repository.
@@ -92,8 +91,6 @@ check-folder() {
 			fi
 		fi
 	done
-
-	popd > /dev/null
 }
 
 find "$HOME/"!(Bilder|Backup) -type d -name .git | sort | while read -r git_dir
