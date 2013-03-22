@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
@@ -32,16 +32,16 @@ def perform(command, dry, data, statusfile):
     :param statusfile: Filename of status file.
     :type statusfile: str
     """
-    print _c.bold + command + _c.reset
-    print _c.bold + ("="*len(command)) + _c.reset
+    print(_c.bold + command + _c.reset)
+    print(_c.bold + ("="*len(command)) + _c.reset)
     if not dry:
         try:
             subprocess.check_call([command])
         except subprocess.CalledProcessError as e:
-            print _c.red + "Error in {command}:".format(command=command) + _c.reset
-            print e
+            print(_c.red + "Error in {command}:".format(command=command) + _c.reset)
+            print(e)
         except OSError as e:
-            print _c.red + "Could not execute {command}.".format(command=command) + _c.reset
+            print(_c.red + "Could not execute {command}.".format(command=command) + _c.reset)
             pass
         else:
             task = command.split('/')[-1]
@@ -51,14 +51,14 @@ def perform(command, dry, data, statusfile):
             data[task]["last"] = str(datetime.datetime.now())
 
             save_data(statusfile, data)
-    print
+    print()
 
 
 def main():
     options = _parse_args()
 
     if not pre_check() and not options.f:
-        print "Aborting. You can use “-f” to run anyway."
+        print("Aborting. You can use “-f” to run anyway.")
         sys.exit(1)
 
     statusfile = os.path.expanduser("~/.local/share/maintenance.js")
@@ -131,7 +131,7 @@ def pre_check():
         powered = int(f.read()) != 0
 
     if not powered:
-        print _c.red + "Power not connected." + _c.reset
+        print(_c.red + "Power not connected." + _c.reset)
         #return False
 
     connected = False
@@ -140,7 +140,7 @@ def pre_check():
         subprocess.check_output(["ping", "-c", "1", "-w", "2",
                                  "martin-ueding.de"])
     except subprocess.CalledProcessError:
-        print _c.red + "No internet connection." + _c.reset
+        print(_c.red + "No internet connection." + _c.reset)
         return False
     else:
         connected = True
