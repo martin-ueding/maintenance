@@ -20,6 +20,18 @@ __docformat__ = "restructuredtext en"
 _c = colorcodes.Colorcodes()
 
 def perform(command, dry, data, statusfile):
+    """
+    Performs a single task.
+
+    :param command: Command to run.
+    :type command: str
+    :param dry: Whether to only print command.
+    :type dry: bool
+    :param data: Whole data.
+    :type data: list
+    :param statusfile: Filename of status file.
+    :type statusfile: str
+    """
     print _c.bold + command + _c.reset
     print _c.bold + ("="*len(command)) + _c.reset
     if not dry:
@@ -96,12 +108,23 @@ def main():
                 perform(command, options.dry, data, statusfile)
 
 def save_data(statusfile, data):
+    """
+    Saves all the data.
+
+    :param statusfile: Filename of status file.
+    :type statusfile: str
+    :param data: Data to save.
+    :type: list
+    """
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
 
 def pre_check():
     """
     Checks whether internet connection and power are attached.
+
+    :return: Whether both internet and power are connected.
+    :rtype: bool
     """
     powered = False
     with open("/sys/class/power_supply/AC/online") as f:
