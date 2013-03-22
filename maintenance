@@ -46,7 +46,7 @@ def main():
     options = _parse_args()
 
     if not pre_check() and not options.f:
-        print "Aborting."
+        print "Aborting. You can use “-f” to run anyway."
         sys.exit(1)
 
     statusfile = os.path.expanduser("~/.local/share/maintenance.js")
