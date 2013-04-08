@@ -84,7 +84,7 @@ class Package(object):
         return "Package('{}')".format(self.name)
 
     def auto(self):
-        print((_c.cyan + self.name + _c.reset))
+        print(_c.cyan + self.name + _c.reset)
 
         os.chdir(basedir)
 
@@ -111,7 +111,6 @@ class Package(object):
 
         os.chdir(os.path.join(basedir, self.name, latest_folder, 'debian'))
         sed_command = ['sed', '-i', 's/UNRELEASED/{}/'.format(current_release), 'changelog']
-        print(sed_command)
         subprocess.check_call(sed_command)
 
         os.chdir(os.path.join(basedir, self.name, self.get_latest_folder()))
