@@ -3,7 +3,6 @@
 
 # Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
-import apt_pkg
 import argparse
 import functools
 import os
@@ -111,9 +110,14 @@ class Package(object):
         except subprocess.CalledProcessError:
             pass
 
-    def get_latest(self, suffix, function=None):
-        files = [x for x in os.listdir(os.path.join(basedir, self.name))
-                 if os.path.isfile(os.path.join(basedir, self.name, x))
+    def get_latest(self, suffix, function=None, folder=False):
+        output = subprocess.check_output("ls | sort -V", shell=True)
+        lines = output.decode().strip().split("\n")
+        files = [x for x in lines
+                 if (
+                     (not folder and os.path.isfile(os.path.join(basedir, self.name, x)))
+                     or (folder and os.path.isdir(os.path.join(basedir, self.name, x)))
+                 )
                  and x.endswith(suffix)]
 
         if function is not None:
@@ -122,8 +126,6 @@ class Package(object):
         if len(files) == 0:
             raise PackagingError("No latest {} found".format(suffix))
 
-        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
-
         return files[-1]
 
     def get_latest_folder(self):
@@ -131,16 +133,10 @@ class Package(object):
         Retrieves the folder (without ``.orig``) which has the latest version
         number. If there is no such folder, ``None`` is returned.
         """
-        folders = [x for x in os.listdir(os.path.join(basedir, self.name))
-                   if os.path.isdir(os.path.join(basedir, self.name, x))
-                   and not x.endswith(".orig")]
+        def function(x):
+            return not x.endswith(".orig")
 
-        if len(folders) == 0:
-            raise PackagingError("No latest folder found")
-
-        folders.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
-
-        return folders[-1]
+        return self.get_latest("", function, folder=True)
 
     def get_latest_tar(self):
         def function(x):
@@ -215,8 +211,6 @@ class Package(object):
 
 def main():
     options = _parse_args()
-
-    apt_pkg.init()
 
     for name in packages:
         try:
