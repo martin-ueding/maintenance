@@ -123,7 +123,7 @@ class Package(object):
             files = [x for x in files if function(x)]
 
         if len(files) == 0:
-            raise PackagingError("No latest {} found".format(suffix))
+            raise PackagingError("No latest *{} found".format(suffix))
 
         return files[-1]
 
