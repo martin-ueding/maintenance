@@ -3,6 +3,13 @@
 
 # Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
+'''
+Goes through the folder with my projects, exports the current git tags with
+``git tarball`` into the packaging folder. Then it uses ``uupdate`` and
+``debuild``, as well as ``dput`` to make sure that all packages in the
+Launchpad PPA are up do date.
+'''
+
 import argparse
 import functools
 import os
@@ -239,7 +246,7 @@ def _parse_args():
     :return: Namespace with arguments.
     :rtype: Namespace
     '''
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     #parser.add_argument('args', metavar='N', type=str, nargs='*', help='Positional arguments.')
     #parser.add_argument('', dest='', type='', default=, help=)
     parser.add_argument('-n', dest='dry_run', action='store_true', default=False, help='dry run')
