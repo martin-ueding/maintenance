@@ -1,0 +1,12 @@
+#!/bin/bash
+# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+
+# Deletes old docdata XML files that Okular creates for every opened document.
+# The problem is that it will create a new file for every single version of a
+# document. There will be a lot of files created if Okular is used as a
+# previewer for ``latexmk``
+
+set -e
+set -u
+
+find "$HOME/.kde/share/apps/okular/docdata" -mtime +30 -delete
