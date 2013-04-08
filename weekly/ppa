@@ -72,7 +72,8 @@ class Package(object):
         os.chdir(basedir)
 
         self.export_latest()
-        self.uupdate()
+        if self.needs_uupdate():
+            self.uupdate()
         if self.needs_building(True):
             self.build(True)
         if self.needs_building(False):
@@ -193,6 +194,22 @@ class Package(object):
 
         prefix = latest[:len(latest_folder)]
         prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
+
+        return latest_folder != prefix
+
+    def needs_uupdate(self):
+        os.chdir(os.path.join(basedir, self.name))
+
+        latest_folder = self.get_latest_folder()
+        latest_tar = self.get_latest_tar()
+
+        print(latest_tar)
+
+        prefix = latest_tar[:len(latest_folder)]
+        prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
+
+        print(latest_folder)
+        print(prefix)
 
         return latest_folder != prefix
 
