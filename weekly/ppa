@@ -22,6 +22,9 @@ __docformat__ = 'restructuredtext en'
 _c = colorcodes.Colorcodes()
 
 current_release = 'quantal'
+'''
+Ubuntu release that the packages should be on.
+'''
 
 packages = [
 
@@ -46,8 +49,14 @@ packages = [
     'xournal-page-count',
 
 ]
+'''
+List of packages that should be uploaded.
+'''
 
 def p(command):
+    '''
+    Prints the given command.
+    '''
     print('$ {}'.format(' '.join(command)))
 
 
@@ -55,6 +64,9 @@ basedir = os.path.expanduser('~/Packaging')
 branchesdir = os.path.expanduser('~/Branches')
 
 class PackagingError(Exception):
+    '''
+    General exception class for this script.
+    '''
     pass
 
 
@@ -63,6 +75,9 @@ class Package(object):
     Models a Debian Package.
     '''
     def __init__(self, name):
+        '''
+
+        '''
         self.name = name
 
     def __repr__(self):
