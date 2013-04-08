@@ -3,8 +3,9 @@
 
 # Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
+import apt_pkg
 import argparse
-import apt
+import functools
 import os
 import subprocess
 
@@ -14,12 +15,17 @@ __docformat__ = "restructuredtext en"
 
 _c = colorcodes.Colorcodes()
 
-_packages = [
+packages = [
 
     "a4-scan",
     "copyright-updater",
     "email-rename",
     "git-changelog",
+
+]
+
+other = [
+
     "git-tarball",
     "jscribble",
     "latex-edit",
@@ -38,137 +44,193 @@ _packages = [
 
 ]
 
+def p(command):
+    print("$ {}".format(" ".join(command)))
+
+subprocess.check_call = p
+
 basedir = os.path.expanduser("~/Packaging")
+branchesdir = os.path.expanduser("~/Branches")
 
 class PackagingError(Exception):
     pass
 
-def export_latest(package):
+
+class Package(object):
     """
-    Goes into the ``~/Branches`` folder and generates a tar archive with the
-    latest version.
-
-    Changes the current working directory.
-
-    :param package: Name of the project.
+    Models a Debian Package.
     """
-    branchesdir = os.path.expanduser("~/Branches")
+    def __init__(self, name):
+        self.name = name
 
-    os.chdir(os.path.join(branchesdir, package))
+    def auto(self):
+        print((_c.cyan + self.name + _c.reset))
 
-    latest = None
+        os.chdir(basedir)
 
-    try:
-        output = subprocess.check_output(["git", "tarball"]).split()
-    except subprocess.CalledProcessError:
-        pass
-    else:
-        if len(output) > 0:
-            latest = output[-1]
+        self.export_latest()
+        self.uupdate()
+        if self.needs_building(True):
+            self.build(True)
+        if self.needs_building(False):
+            self.build(False)
+        self.upload()
 
-    return latest
+    def build(self, source=True):
+        """
+        Builds the given package, binary or source.
+        """
+        os.chdir(os.path.join(basedir, self.name, self.get_latest_folder()))
 
-def get_latest_folder(package):
-    """
-    Retrieves the folder (without ``.orig``) which has the latest version
-    number. If there is no such folder, ``None`` is returned.
-    """
-    folders = [x for x in os.listdir(os.path.join(basedir, package))
-               if os.path.isdir(os.path.join(basedir, package, x))
-               and not x.endswith(".orig")]
+        command = ["debuild"]
 
-    if len(folders) == 0:
-        raise PackagingError("No latest folder found")
+        if source:
+            command.append("-S")
 
-    folders.sort(cmp=apt.VersionCompare)
+        try:
+            subprocess.check_call(command)
+        except subprocess.CalledProcessError as e:
+            print(e)
+            print((_c.red + "Build failed." + _c.reset))
 
-    return folders[-1]
+    def export_latest(self):
+        """
+        Goes into the ``~/Branches`` folder and generates a tar archive with the
+        latest version.
 
-def get_latest_dsc(package):
-    files = [x for x in os.listdir(os.path.join(basedir, package))
-             if os.path.isfile(os.path.join(basedir, package, x))
-             and x.endswith(".dsc")]
+        Changes the current working directory.
+        """
+        os.chdir(os.path.join(branchesdir, self.name))
 
-    if len(files) == 0:
-        raise PackagingError("No latest *.dsc found")
+        try:
+            subprocess.check_call(["git", "tarball"])
+        except subprocess.CalledProcessError:
+            pass
 
-    files.sort(cmp=apt.VersionCompare)
+    def get_latest_changes(self):
+        files = [x for x in os.listdir(os.path.join(basedir, self.name))
+                 if os.path.isfile(os.path.join(basedir, self.name, x))
+                 and x.endswith("_source.changes")]
 
-    return files[-1]
+        if len(files) == 0:
+            raise PackagingError("No latest *_source.changes found")
 
-def get_latest_changes(package):
-    files = [x for x in os.listdir(os.path.join(basedir, package))
-             if os.path.isfile(os.path.join(basedir, package, x))
-             and x.endswith("_source.changes")]
+        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
 
-    if len(files) == 0:
-        raise PackagingError("No latest *_source.changes found")
+        return files[-1]
 
-    files.sort(cmp=apt.VersionCompare)
+    def get_latest_deb(self):
+        files = [x for x in os.listdir(os.path.join(basedir, self.name))
+                 if os.path.isfile(os.path.join(basedir, self.name, x))
+                 and x.endswith(".deb")]
 
-    return files[-1]
+        if len(files) == 0:
+            raise PackagingError("No latest *.deb found")
 
-def get_latest_tar(package):
-    files = [x for x in os.listdir(os.path.join(basedir, package))
-             if os.path.isfile(os.path.join(basedir, package, x))
-             and x.endswith(".tar.gz")
-             and not x.endswith(".orig.tar.gz")
-             and not x.endswith(".debian.tar.gz")]
+        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
 
-    if len(files) == 0:
-        raise PackagingError("No latest *.tar.gz found")
+        return files[-1]
 
-    files.sort(cmp=apt.VersionCompare)
+    def get_latest_dsc(self):
+        files = [x for x in os.listdir(os.path.join(basedir, self.name))
+                 if os.path.isfile(os.path.join(basedir, self.name, x))
+                 and x.endswith(".dsc")]
 
-    return files[-1]
+        if len(files) == 0:
+            raise PackagingError("No latest *.dsc found")
 
-def build(package, source=True):
-    try:
-        os.chdir(os.path.join(basedir, package, get_latest_folder(package)))
-        subprocess.check_call(["debuild", "-S"])
-    except subprocess.CalledProcessError as e:
-        print(e)
-        print((_c.red + "Build failed." + _c.reset))
+        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
 
-def upload(package):
-    changes = get_latest_changes(package)
-    try:
-        os.chdir(os.path.join(basedir, package))
-        subprocess.check_call(["dput", "stable", changes])
-    except subprocess.CalledProcessError as e:
-        print(e)
-        print((_c.red + "Upload failed." + _c.reset))
+        return files[-1]
 
-def uupdate(package):
-    latest_tar = get_latest_tar(package)
-    latest_folder = get_latest_folder(package)
+    def get_latest_folder(self):
+        """
+        Retrieves the folder (without ``.orig``) which has the latest version
+        number. If there is no such folder, ``None`` is returned.
+        """
+        folders = [x for x in os.listdir(os.path.join(basedir, self.name))
+                   if os.path.isdir(os.path.join(basedir, self.name, x))
+                   and not x.endswith(".orig")]
 
-    os.chdir(os.path.join(basedir, package, latest_folder))
+        if len(folders) == 0:
+            raise PackagingError("No latest folder found")
 
-    try:
-        command = ["uupdate", "../"+latest_tar]
-        subprocess.check_call(command)
-    except subprocess.CalledProcessError as e:
-        print(e)
-        pass
+        folders.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
 
-def handle_package(package):
-    print((_c.cyan + package + _c.reset))
+        return folders[-1]
 
-    os.chdir(basedir)
+    def get_latest_tar(self):
+        files = [x for x in os.listdir(os.path.join(basedir, self.name))
+                 if os.path.isfile(os.path.join(basedir, self.name, x))
+                 and x.endswith(".tar.gz")
+                 and not x.endswith(".orig.tar.gz")
+                 and not x.endswith(".debian.tar.gz")]
 
-    export_latest(package)
-    uupdate(package)
-    build(package)
-    upload(package)
-    build(package, source=False)
+        if len(files) == 0:
+            raise PackagingError("No latest *.tar.gz found")
+
+        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
+
+        return files[-1]
+
+    def needs_building(self, source=True):
+        """
+        Checks whether the package needs to be build.
+
+        It checks the latest ``.changes`` and ``.deb`` in the folder and
+        compares them to the latest folder.
+        """
+        os.chdir(os.path.join(basedir, self.name))
+
+        latest_folder = self.get_latest_folder()
+        if source:
+            latest = self.get_latest_changes()
+        else:
+            latest = self.get_latest_deb()
+
+        prefix = latest[:len(latest_folder)]
+        prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
+
+        return latest_folder != prefix
+
+    def upload(self):
+        changes = self.get_latest_changes()
+        try:
+            os.chdir(os.path.join(basedir, self.name))
+            subprocess.check_call(["dput", "stable", changes])
+        except subprocess.CalledProcessError as e:
+            print(e)
+            print((_c.red + "Upload failed." + _c.reset))
+
+    def uupdate(self):
+        """
+        Goes into the latest folder and calls ``uupdate`` onto the latest tar
+        archive.
+
+        After that, there should be a new latest folder.
+        """
+        latest_tar = self.get_latest_tar()
+        latest_folder = self.get_latest_folder()
+
+        os.chdir(os.path.join(basedir, self.name, latest_folder))
+
+        try:
+            command = ["uupdate", "../"+latest_tar]
+            subprocess.check_call(command)
+        except subprocess.CalledProcessError as e:
+            print(e)
+            pass
+
 
 def main():
     options = _parse_args()
 
-    for package in _packages:
+    apt_pkg.init()
+
+    for name in packages:
         try:
-            handle_package(package)
+            package = Package(name)
+            package.auto()
         except PackagingError as e:
             print(e)
             print((_c.red + "Packaging of {0} failed.".format(package) + _c.reset))
