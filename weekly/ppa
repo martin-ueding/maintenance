@@ -10,51 +10,51 @@ import subprocess
 
 import colorcodes
 
-__docformat__ = "restructuredtext en"
+__docformat__ = 'restructuredtext en'
 
 _c = colorcodes.Colorcodes()
 
-current_release = "quantal"
+current_release = 'quantal'
 
 packages = [
 
-    "a4-scan",
-    "copyright-updater",
-    "email-rename",
-    "git-changelog",
-    "git-tarball",
-    "jscribble",
-    "latex-edit",
-    "legacy-file-formats",
-    "mp3-packer",
-    "multiimage",
-    "pdflatex-multifont",
-    "project-ubernahme",
-    "risk-auto-dice",
-    "template-spawner",
-    "think-rotate",
-    "unwrap-pdf-to-jpeg",
-    "van-allen-sim-3d",
-    "vim-headings",
-    "xournal-page-count",
+    'a4-scan',
+    'copyright-updater',
+    'email-rename',
+    'git-changelog',
+    'git-tarball',
+    'jscribble',
+    'latex-edit',
+    'legacy-file-formats',
+    'mp3-packer',
+    'multiimage',
+    'pdflatex-multifont',
+    'project-ubernahme',
+    'risk-auto-dice',
+    'template-spawner',
+    'think-rotate',
+    'unwrap-pdf-to-jpeg',
+    'van-allen-sim-3d',
+    'vim-headings',
+    'xournal-page-count',
 
 ]
 
 def p(command):
-    print("$ {}".format(" ".join(command)))
+    print('$ {}'.format(' '.join(command)))
 
 
-basedir = os.path.expanduser("~/Packaging")
-branchesdir = os.path.expanduser("~/Branches")
+basedir = os.path.expanduser('~/Packaging')
+branchesdir = os.path.expanduser('~/Branches')
 
 class PackagingError(Exception):
     pass
 
 
 class Package(object):
-    """
+    '''
     Models a Debian Package.
-    """
+    '''
     def __init__(self, name):
         self.name = name
 
@@ -77,52 +77,52 @@ class Package(object):
         try:
             self.upload()
         except PackagingError as e:
-            print("Caught error, trying to build source again.")
+            print('Caught error, trying to build source again.')
             self.build(True)
             self.upload()
 
     def build(self, source=True):
-        """
+        '''
         Builds the given package, binary or source.
-        """
+        '''
         latest_folder = self.get_latest_folder()
 
-        os.chdir(os.path.join(basedir, self.name, latest_folder, "debian"))
-        sed_command = ["sed", '-i', 's/UNRELEASED/{}/'.format(current_release), 'changelog']
+        os.chdir(os.path.join(basedir, self.name, latest_folder, 'debian'))
+        sed_command = ['sed', '-i', 's/UNRELEASED/{}/'.format(current_release), 'changelog']
         print(sed_command)
         subprocess.check_call(sed_command)
 
         os.chdir(os.path.join(basedir, self.name, self.get_latest_folder()))
 
-        command = ["debuild"]
+        command = ['debuild']
 
         if source:
-            command.append("-S")
+            command.append('-S')
 
         try:
             subprocess.check_call(command)
         except subprocess.CalledProcessError as e:
             print(e)
-            raise PackagingError("Build failed.")
+            raise PackagingError('Build failed.')
 
     def export_latest(self):
-        """
+        '''
         Goes into the ``~/Branches`` folder and generates a tar archive with the
         latest version.
 
         Changes the current working directory.
-        """
+        '''
         os.chdir(os.path.join(branchesdir, self.name))
 
         try:
-            subprocess.check_call(["git", "tarball"])
+            subprocess.check_call(['git', 'tarball'])
         except subprocess.CalledProcessError:
             pass
 
     def get_latest(self, suffix, function=None, folder=False):
         os.chdir(os.path.join(basedir, self.name))
-        output = subprocess.check_output("ls | sort -V", shell=True)
-        lines = output.decode().strip().split("\n")
+        output = subprocess.check_output('ls | sort -V', shell=True)
+        lines = output.decode().strip().split('\n')
         files = [x for x in lines
                  if (
                      (not folder and os.path.isfile(os.path.join(basedir, self.name, x)))
@@ -134,43 +134,43 @@ class Package(object):
             files = [x for x in files if function(x)]
 
         if len(files) == 0:
-            raise PackagingError("No latest *{} found".format(suffix))
+            raise PackagingError('No latest *{} found'.format(suffix))
 
         return files[-1]
 
     def get_latest_folder(self):
-        """
+        '''
         Retrieves the folder (without ``.orig``) which has the latest version
         number. If there is no such folder, ``None`` is returned.
-        """
+        '''
         def function(x):
-            return not x.endswith(".orig")
+            return not x.endswith('.orig')
 
-        return self.get_latest("", function, folder=True)
+        return self.get_latest('', function, folder=True)
 
     def get_latest_tar(self):
         def function(x):
-            return not x.endswith(".orig.tar.gz") and not x.endswith(".debian.tar.gz")
+            return not x.endswith('.orig.tar.gz') and not x.endswith('.debian.tar.gz')
 
-        return self.get_latest(".tar.gz", function)
+        return self.get_latest('.tar.gz', function)
 
     def needs_building(self, source=True):
-        """
+        '''
         Checks whether the package needs to be build.
 
         It checks the latest ``.changes`` and ``.deb`` in the folder and
         compares them to the latest folder.
-        """
+        '''
         os.chdir(os.path.join(basedir, self.name))
 
         latest_folder = self.get_latest_folder()
         if source:
-            latest = self.get_latest("_source.changes")
+            latest = self.get_latest('_source.changes')
         else:
-            latest = self.get_latest(".deb")
+            latest = self.get_latest('.deb')
 
         prefix = latest[:len(latest_folder)]
-        prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
+        prefix = prefix[:len(self.name)] + '-' + prefix[len(self.name) + 1:]
 
         return latest_folder != prefix
 
@@ -180,38 +180,38 @@ class Package(object):
         latest_folder = self.get_latest_folder()
         latest_tar = self.get_latest_tar()
 
-        prefix = latest_tar[:-len(".tar.gz")]
-        prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
+        prefix = latest_tar[:-len('.tar.gz')]
+        prefix = prefix[:len(self.name)] + '-' + prefix[len(self.name) + 1:]
 
         return latest_folder != prefix
 
     def upload(self):
-        changes = self.get_latest("_source.changes")
+        changes = self.get_latest('_source.changes')
         try:
             os.chdir(os.path.join(basedir, self.name))
-            subprocess.check_call(["dput", "stable", changes])
+            subprocess.check_call(['dput', 'stable', changes])
         except subprocess.CalledProcessError as e:
             print(e)
-            raise PackagingError("Upload failed")
+            raise PackagingError('Upload failed')
 
     def uupdate(self):
-        """
+        '''
         Goes into the latest folder and calls ``uupdate`` onto the latest tar
         archive.
 
         After that, there should be a new latest folder.
-        """
+        '''
         latest_tar = self.get_latest_tar()
         latest_folder = self.get_latest_folder()
 
         os.chdir(os.path.join(basedir, self.name, latest_folder))
 
         try:
-            command = ["uupdate", "../"+latest_tar]
+            command = ['uupdate', '../'+latest_tar]
             subprocess.check_call(command)
         except subprocess.CalledProcessError as e:
             print(e)
-            raise PackagingError("uupdate failed")
+            raise PackagingError('uupdate failed')
 
 
 def main():
@@ -226,26 +226,26 @@ def main():
             package.auto()
         except OSError as e:
             print(_c.red + str(e) + _c.reset)
-            print(_c.red + "Packaging of {0} failed.".format(package) + _c.reset)
+            print(_c.red + 'Packaging of {0} failed.'.format(package) + _c.reset)
         except PackagingError as e:
             print(_c.red + str(e) + _c.reset)
-            print(_c.red + "Packaging of {0} failed.".format(package) + _c.reset)
+            print(_c.red + 'Packaging of {0} failed.'.format(package) + _c.reset)
 
 
 def _parse_args():
-    """
+    '''
     Parses the command line arguments.
 
     :return: Namespace with arguments.
     :rtype: Namespace
-    """
+    '''
     parser = argparse.ArgumentParser()
-    #parser.add_argument("args", metavar="N", type=str, nargs="*", help="Positional arguments.")
-    #parser.add_argument("", dest="", type="", default=, help=)
-    parser.add_argument("-n", dest="dry_run", action="store_true", default=False, help="dry run")
-    #parser.add_argument("--version", action="version", version="<the version>")
+    #parser.add_argument('args', metavar='N', type=str, nargs='*', help='Positional arguments.')
+    #parser.add_argument('', dest='', type='', default=, help=)
+    parser.add_argument('-n', dest='dry_run', action='store_true', default=False, help='dry run')
+    #parser.add_argument('--version', action='version', version='<the version>')
 
     return parser.parse_args()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
