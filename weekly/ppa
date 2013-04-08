@@ -14,6 +14,8 @@ __docformat__ = "restructuredtext en"
 
 _c = colorcodes.Colorcodes()
 
+current_release = "quantal"
+
 packages = [
 
     "a4-scan",
@@ -72,16 +74,29 @@ class Package(object):
         self.export_latest()
         if self.needs_uupdate():
             self.uupdate()
-        if self.needs_building(True):
-            self.build(True)
         if self.needs_building(False):
             self.build(False)
-        self.upload()
+        if self.needs_building(True):
+            self.build(True)
+
+        try:
+            self.upload()
+        except PackagingError as e:
+            print("Caught error, trying to build source again.")
+            self.build(True)
+            self.upload()
 
     def build(self, source=True):
         """
         Builds the given package, binary or source.
         """
+        latest_folder = self.get_latest_folder()
+
+        os.chdir(os.path.join(basedir, self.name, latest_folder, "debian"))
+        sed_command = ["sed", '-i', 's/UNRELEASED/{}/'.format(current_release), 'changelog']
+        print(sed_command)
+        subprocess.check_call(sed_command)
+
         os.chdir(os.path.join(basedir, self.name, self.get_latest_folder()))
 
         command = ["debuild"]
@@ -93,7 +108,7 @@ class Package(object):
             subprocess.check_call(command)
         except subprocess.CalledProcessError as e:
             print(e)
-            print((_c.red + "Build failed." + _c.reset))
+            raise PackagingError("Build failed.")
 
     def export_latest(self):
         """
@@ -110,6 +125,7 @@ class Package(object):
             pass
 
     def get_latest(self, suffix, function=None, folder=False):
+        os.chdir(os.path.join(basedir, self.name))
         output = subprocess.check_output("ls | sort -V", shell=True)
         lines = output.decode().strip().split("\n")
         files = [x for x in lines
@@ -169,7 +185,7 @@ class Package(object):
         latest_folder = self.get_latest_folder()
         latest_tar = self.get_latest_tar()
 
-        prefix = latest_tar[:len(".tar.gz")]
+        prefix = latest_tar[:-len(".tar.gz")]
         prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
 
         return latest_folder != prefix
@@ -181,7 +197,7 @@ class Package(object):
             subprocess.check_call(["dput", "stable", changes])
         except subprocess.CalledProcessError as e:
             print(e)
-            print((_c.red + "Upload failed." + _c.reset))
+            raise PackagingError("Upload failed")
 
     def uupdate(self):
         """
@@ -200,7 +216,7 @@ class Package(object):
             subprocess.check_call(command)
         except subprocess.CalledProcessError as e:
             print(e)
-            pass
+            raise PackagingError("uupdate failed")
 
 
 def main():
@@ -214,8 +230,8 @@ def main():
             package = Package(name)
             package.auto()
         except PackagingError as e:
-            print(e)
-            print((_c.red + "Packaging of {0} failed.".format(package) + _c.reset))
+            print(_c.red + str(e) + _c.reset)
+            print(_c.red + "Packaging of {0} failed.".format(package) + _c.reset)
 
 
 def _parse_args():
