@@ -9,4 +9,4 @@
 set -e
 set -u
 
-find "$HOME/.kde/share/apps/okular/docdata" -mtime +30 -delete
+find "$HOME/.kde/share/apps/okular/docdata" -mtime +30 -print -delete
