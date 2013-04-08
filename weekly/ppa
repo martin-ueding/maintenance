@@ -22,11 +22,6 @@ packages = [
     "copyright-updater",
     "email-rename",
     "git-changelog",
-
-]
-
-other = [
-
     "git-tarball",
     "jscribble",
     "latex-edit",
