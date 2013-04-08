@@ -169,13 +169,8 @@ class Package(object):
         latest_folder = self.get_latest_folder()
         latest_tar = self.get_latest_tar()
 
-        print(latest_tar)
-
-        prefix = latest_tar[:len(latest_folder)]
+        prefix = latest_tar[:len(".tar.gz")]
         prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
-
-        print(latest_folder)
-        print(prefix)
 
         return latest_folder != prefix
 
