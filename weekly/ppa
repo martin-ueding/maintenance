@@ -128,7 +128,7 @@ def build(package, source=True):
         subprocess.check_call(["debuild", "-S"])
     except subprocess.CalledProcessError as e:
         print(e)
-        print(_c.red + "Build failed." + _c.reset)
+        print((_c.red + "Build failed." + _c.reset))
 
 def upload(package):
     changes = get_latest_changes(package)
@@ -137,7 +137,7 @@ def upload(package):
         subprocess.check_call(["dput", "stable", changes])
     except subprocess.CalledProcessError as e:
         print(e)
-        print(_c.red + "Upload failed." + _c.reset)
+        print((_c.red + "Upload failed." + _c.reset))
 
 def uupdate(package):
     latest_tar = get_latest_tar(package)
@@ -149,11 +149,11 @@ def uupdate(package):
         command = ["uupdate", "../"+latest_tar]
         subprocess.check_call(command)
     except subprocess.CalledProcessError as e:
-        print e
+        print(e)
         pass
 
 def handle_package(package):
-    print(_c.cyan + package + _c.reset)
+    print((_c.cyan + package + _c.reset))
 
     os.chdir(basedir)
 
@@ -171,7 +171,7 @@ def main():
             handle_package(package)
         except PackagingError as e:
             print(e)
-            print(_c.red + "Packaging of {0} failed.".format(package) + _c.reset)
+            print((_c.red + "Packaging of {0} failed.".format(package) + _c.reset))
 
 
 def _parse_args():
