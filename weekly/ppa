@@ -111,37 +111,16 @@ class Package(object):
         except subprocess.CalledProcessError:
             pass
 
-    def get_latest_changes(self):
+    def get_latest(self, suffix, function=None):
         files = [x for x in os.listdir(os.path.join(basedir, self.name))
                  if os.path.isfile(os.path.join(basedir, self.name, x))
-                 and x.endswith("_source.changes")]
+                 and x.endswith(suffix)]
+
+        if function is not None:
+            files = [x for x in files if function(x)]
 
         if len(files) == 0:
-            raise PackagingError("No latest *_source.changes found")
-
-        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
-
-        return files[-1]
-
-    def get_latest_deb(self):
-        files = [x for x in os.listdir(os.path.join(basedir, self.name))
-                 if os.path.isfile(os.path.join(basedir, self.name, x))
-                 and x.endswith(".deb")]
-
-        if len(files) == 0:
-            raise PackagingError("No latest *.deb found")
-
-        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
-
-        return files[-1]
-
-    def get_latest_dsc(self):
-        files = [x for x in os.listdir(os.path.join(basedir, self.name))
-                 if os.path.isfile(os.path.join(basedir, self.name, x))
-                 and x.endswith(".dsc")]
-
-        if len(files) == 0:
-            raise PackagingError("No latest *.dsc found")
+            raise PackagingError("No latest {} found".format(suffix))
 
         files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
 
@@ -164,18 +143,10 @@ class Package(object):
         return folders[-1]
 
     def get_latest_tar(self):
-        files = [x for x in os.listdir(os.path.join(basedir, self.name))
-                 if os.path.isfile(os.path.join(basedir, self.name, x))
-                 and x.endswith(".tar.gz")
-                 and not x.endswith(".orig.tar.gz")
-                 and not x.endswith(".debian.tar.gz")]
+        def function(x):
+            return not x.endswith(".orig.tar.gz") and not x.endswith(".debian.tar.gz")
 
-        if len(files) == 0:
-            raise PackagingError("No latest *.tar.gz found")
-
-        files.sort(key=functools.cmp_to_key(apt_pkg.version_compare))
-
-        return files[-1]
+        return self.get_latest(".tar.gz", function)
 
     def needs_building(self, source=True):
         """
@@ -188,9 +159,9 @@ class Package(object):
 
         latest_folder = self.get_latest_folder()
         if source:
-            latest = self.get_latest_changes()
+            latest = self.get_latest("_source.changes")
         else:
-            latest = self.get_latest_deb()
+            latest = self.get_latest(".deb")
 
         prefix = latest[:len(latest_folder)]
         prefix = prefix[:len(self.name)] + "-" + prefix[len(self.name) + 1:]
@@ -214,7 +185,7 @@ class Package(object):
         return latest_folder != prefix
 
     def upload(self):
-        changes = self.get_latest_changes()
+        changes = self.get_latest("_source.changes")
         try:
             os.chdir(os.path.join(basedir, self.name))
             subprocess.check_call(["dput", "stable", changes])
