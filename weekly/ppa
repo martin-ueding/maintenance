@@ -54,6 +54,8 @@ packages = [
 List of packages that should be uploaded.
 '''
 
+upgrades = []
+
 def p(command):
     '''
     Prints the given command.
@@ -108,6 +110,9 @@ class Package(object):
         needs_upgrade, installed, latest = self.needs_upgrade()
         if needs_upgrade:
             print(_c.orange + 'This package needs upgrading, {} → {}'.format(installed, latest) + _c.reset)
+            upgrades.append('dpkg -i {}'.format(
+                os.path.join(basedir, self.name, self.get_latest('.deb'))
+            ))
 
     def build(self, source=True):
         '''
@@ -291,6 +296,14 @@ def main():
         except PackagingError as e:
             print(_c.red + str(e) + _c.reset)
             print(_c.red + 'Packaging of {0} failed.'.format(package) + _c.reset)
+
+    if len(upgrades) > 0:
+        print()
+        print('possible upgrades')
+        print('-----------------')
+        print()
+        for upgrade in upgrades:
+            print(upgrade)
 
 
 def _parse_args():
