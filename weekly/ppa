@@ -13,6 +13,7 @@ Launchpad PPA are up do date.
 import argparse
 import functools
 import os
+import re
 import subprocess
 
 import colorcodes
@@ -75,24 +76,22 @@ class Package(object):
     Models a Debian Package.
     '''
     def __init__(self, name):
-        '''
-
-        '''
         self.name = name
 
     def __repr__(self):
         return "Package('{}')".format(self.name)
 
     def auto(self):
+        print()
         print(_c.cyan + self.name + _c.reset)
+        print(_c.cyan + '-'*len(self.name) + _c.reset)
+        print()
 
         os.chdir(basedir)
 
         self.export_latest()
         if self.needs_uupdate():
             self.uupdate()
-        if self.needs_building(False):
-            self.build(False)
         if self.needs_building(True):
             self.build(True)
 
@@ -102,6 +101,13 @@ class Package(object):
             print('Caught error, trying to build source again.')
             self.build(True)
             self.upload()
+
+        if self.needs_building(False):
+            self.build(False)
+
+        needs_upgrade, installed, latest = self.needs_upgrade()
+        if needs_upgrade:
+            print(_c.orange + 'This package needs upgrading, {} → {}'.format(installed, latest) + _c.reset)
 
     def build(self, source=True):
         '''
@@ -175,6 +181,27 @@ class Package(object):
 
         return self.get_latest('.tar.gz', function)
 
+    def installed_version(self):
+        '''
+        Checks ``apt-cache`` for the installed version of the package.
+
+        I am aware that there is an ``apt`` module for Python which does the
+        very thing. But feel lazy and just get it out of the output and parse
+        that.
+        '''
+        try:
+            command = ['apt-cache', 'show', self.name]
+            output = subprocess.check_output(command)
+        except subprocess.CalledProcessError as e:
+            print(e)
+        else:
+            lines = output.decode().strip().split('\n')
+            for line in lines:
+                if line.startswith('Version:'):
+                    words = line.strip().split()
+
+                    return words[1]
+
     def needs_building(self, source=True):
         '''
         Checks whether the package needs to be build.
@@ -194,6 +221,19 @@ class Package(object):
         prefix = prefix[:len(self.name)] + '-' + prefix[len(self.name) + 1:]
 
         return latest_folder != prefix
+
+    def needs_upgrade(self):
+        '''
+        Checks whether the package needs to be updated.
+        '''
+        installed = self.installed_version()
+        latest_deb = self.get_latest('.deb')
+        pattern = r'{}_([^_]+)_.+\.deb'.format(self.name)
+        m = re.match(pattern, latest_deb)
+        if m:
+            latest_version = m.group(1)
+
+        return latest_version != installed, installed, latest_version
 
     def needs_uupdate(self):
         os.chdir(os.path.join(basedir, self.name))
