@@ -13,6 +13,7 @@ Launchpad PPA are up do date.
 import argparse
 import functools
 import os
+import platform
 import re
 import subprocess
 
@@ -22,7 +23,7 @@ __docformat__ = 'restructuredtext en'
 
 _c = colorcodes.Colorcodes()
 
-current_release = 'quantal'
+current_release = platform.dist()[2]
 '''
 Ubuntu release that the packages should be on.
 '''
