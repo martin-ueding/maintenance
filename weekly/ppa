@@ -40,6 +40,31 @@ packages = [
     'mp3-packer',
     'multiimage',
     'pdflatex-multifont',
+    'peer-review',
+    'project-ubernahme',
+    'risk-auto-dice',
+    'template-spawner',
+    'think-rotate',
+    'unwrap-pdf-to-jpeg',
+    'van-allen-sim-3d',
+    'vim-headings',
+    'xournal-page-count',
+
+]
+
+public = [
+
+    'a4-scan',
+    'copyright-updater',
+    'email-rename',
+    'git-changelog',
+    'git-tarball',
+    'jscribble',
+    'latex-edit',
+    'legacy-file-formats',
+    'mp3-packer',
+    'multiimage',
+    'pdflatex-multifont',
     'project-ubernahme',
     'risk-auto-dice',
     'template-spawner',
@@ -94,15 +119,16 @@ class Package(object):
         self.export_latest()
         if self.needs_uupdate():
             self.uupdate()
-        if self.needs_building(True):
-            self.build(True)
 
-        try:
-            self.upload()
-        except PackagingError as e:
-            print('Caught error, trying to build source again.')
-            self.build(True)
-            self.upload()
+        if self.name in public:
+            if self.needs_building(True):
+                self.build(True)
+            try:
+                self.upload()
+            except PackagingError as e:
+                print('Caught error, trying to build source again.')
+                self.build(True)
+                self.upload()
 
         if self.needs_building(False):
             self.build(False)
