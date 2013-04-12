@@ -28,35 +28,7 @@ current_release = platform.dist()[2]
 Ubuntu release that the packages should be on.
 '''
 
-packages = [
-
-    'a4-scan',
-    'chaos-repos',
-    'copyright-updater',
-    'email-rename',
-    'git-changelog',
-    'git-ignore-untracked',
-    'git-tarball',
-    'latex-edit',
-    'legacy-file-formats',
-    'mp3-packer',
-    'multiimage',
-    'open-in-browser',
-    'pdflatex-multifont',
-    'peer-review',
-    'picture-db-scripts',
-    'project-ubernahme',
-    'prolint',
-    'risk-auto-dice',
-    'template-spawner',
-    'tex-keywordprg',
-    'think-rotate',
-    'unwrap-pdf-to-jpeg',
-    'van-allen-sim-3d',
-    'vim-headings',
-    'xournal-page-count',
-
-]
+packages = sorted(os.listdir(os.path.expanduser('~/Packaging')))
 
 public = [
 
