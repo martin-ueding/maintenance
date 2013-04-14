@@ -33,6 +33,7 @@ packages = sorted(os.listdir(os.path.expanduser('~/Packaging')))
 public = [
 
     'a4-scan',
+    'adium2pidgin',
     'copyright-updater',
     'email-rename',
     'git-changelog',
