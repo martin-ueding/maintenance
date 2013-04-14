@@ -32,8 +32,9 @@ def perform(command, dry, data, statusfile):
     :param statusfile: Filename of status file.
     :type statusfile: str
     """
-    print(_c.bold + command + _c.reset)
-    print(_c.bold + ("="*len(command)) + _c.reset)
+    task = os.path.basename(command)
+    print(_c.bold + task + _c.reset)
+    print(_c.bold + ("="*len(task)) + _c.reset)
     if not dry:
         try:
             subprocess.check_call([command])
@@ -44,7 +45,6 @@ def perform(command, dry, data, statusfile):
             print(_c.red + "Could not execute {command}.".format(command=command) + _c.reset)
             pass
         else:
-            task = command.split('/')[-1]
             if not task in data:
                 data[task] = {}
 
@@ -56,6 +56,8 @@ def perform(command, dry, data, statusfile):
 
 def main():
     options = _parse_args()
+
+    sharedir = "/tmp/maint/usr/share/maintenance"
 
     if not pre_check() and not options.f:
         print("Aborting. You can use “-f” to run anyway.")
@@ -72,11 +74,12 @@ def main():
     if len(options.periodics) == 0:
         # Automatic modus.
         for periodic in ["daily", "weekly", "monthly", "quarterly", "annually"]:
-            for task in os.listdir(periodic):
+            periodic_dir = os.path.join(sharedir, periodic)
+            for task in os.listdir(periodic_dir):
                 if task.startswith("."):
                     continue
 
-                command = os.path.join(periodic, task)
+                command = os.path.join(periodic_dir, task)
 
                 needs = True
 
@@ -101,7 +104,8 @@ def main():
     else:
         # Do what the user told.
         for periodic in options.periodics:
-            for task in os.listdir(periodic):
+            periodic_dir = os.path.join(sharedir, periodic)
+            for task in os.listdir(periodic_dir):
                 if task.startswith("."):
                     continue
                 command = os.path.join(periodic, task)
