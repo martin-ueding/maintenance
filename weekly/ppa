@@ -34,6 +34,7 @@ public = [
 
     'a4-scan',
     'adium2pidgin',
+    'bogomips'
     'copyright-updater',
     'email-rename',
     'git-changelog',
@@ -46,6 +47,7 @@ public = [
     'multiimage',
     'open-in-browser',
     'pdflatex-multifont',
+    'php-note-capture',
     'project-ubernahme',
     'risk-auto-dice',
     'template-spawner',
@@ -152,12 +154,14 @@ class Package(object):
 
         Changes the current working directory.
         '''
-        os.chdir(os.path.join(branchesdir, self.name))
-
-        try:
-            subprocess.check_call(['git', 'tarball'])
-        except subprocess.CalledProcessError:
-            pass
+        for d in [branchesdir, os.path.expanduser('~/.vim/bundle')]:
+            try:
+                os.chdir(os.path.join(branchesdir, self.name))
+                subprocess.check_call(['git', 'tarball'])
+            except subprocess.CalledProcessError:
+                pass
+            except OSError:
+                pass
 
     def get_latest(self, suffix, function=None, folder=False):
         os.chdir(os.path.join(basedir, self.name))
