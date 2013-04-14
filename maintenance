@@ -57,7 +57,7 @@ def perform(command, dry, data, statusfile):
 def main():
     options = _parse_args()
 
-    sharedir = "/tmp/maint/usr/share/maintenance"
+    sharedir = "/usr/share/maintenance"
 
     if not pre_check() and not options.f:
         print("Aborting. You can use “-f” to run anyway.")
