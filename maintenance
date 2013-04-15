@@ -137,8 +137,6 @@ def main():
         with open(statusfile) as f:
             data = json.load(f)
 
-    print(data)
-
     threads_disk = []
     threads_nodisk = []
     for command, attributes in tasks.items():
@@ -190,7 +188,6 @@ def save_data(data):
     """
     Saves all the data.
     """
-    print("Saving", data)
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
 
