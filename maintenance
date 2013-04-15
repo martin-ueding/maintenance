@@ -10,9 +10,10 @@ import glob
 import json
 import os
 import os.path
+import prettytable
 import subprocess
 import sys
-import prettytable
+import threading
 
 import colorcodes
 
@@ -20,49 +21,60 @@ __docformat__ = "restructuredtext en"
 
 _c = colorcodes.Colorcodes()
 
+statusfile = os.path.expanduser("~/.local/share/maintenance.js")
+data = {}
+save_data_lock = threading.Lock()
 
-def perform(command, attributes, options, data, statusfile):
-    """
-    Performs a single task.
+class Task(threading.Thread):
+    def __init__(self, command, attributes, options):
+        """
+        :param command: Command to run.
+        :type command: str
+        :param attributes: Attributes of this task.
+        :type attributes: dict
+        :param dry: Whether to only print command.
+        :type dry: bool
+        """
+        super().__init__()
+        self.command = command
+        self.attributes = attributes
+        self.options = options
 
-    :param command: Command to run.
-    :type command: str
-    :param attributes: Attributes of this task.
-    :type attributes: dict
-    :param dry: Whether to only print command.
-    :type dry: bool
-    :param data: Whole data.
-    :type data: list
-    :param statusfile: Filename of status file.
-    :type statusfile: str
-    """
-    task = os.path.basename(command)
-    print()
-    print(_c.bold + task + _c.reset)
-    print(_c.bold + ("="*len(task)) + _c.reset)
-    print()
+    def run(self):
+        """
+        Performs a single task.
+        """
+        task = os.path.basename(self.command)
+        print()
+        print(_c.bold + task + _c.reset)
+        print(_c.bold + ("="*len(task)) + _c.reset)
+        print()
 
-    internet, power = pre_check()
+        internet, power = pre_check()
 
-    if not ((internet and attributes['internet']) or options.f):
-        print("Aborting this task. You can use “-f” to run it anyway.")
-        return
+        if (self.attributes['internet'] and not internet) or self.options.f:
+            print("Aborting this task. You can use “-f” to run it anyway.")
+            return
 
-    if not options.dry:
-        try:
-            syscommand = 'maintenance-{}'.format(command)
-            subprocess.check_call([syscommand])
-        except subprocess.CalledProcessError as e:
-            print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
-            print(e)
-        except OSError as e:
-            print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
-            pass
-        else:
-            if not task in data:
-                data[task] = {}
-            data[task]["last"] = str(datetime.datetime.now())
-            save_data(statusfile, data)
+        if not self.options.dry:
+            try:
+                syscommand = 'maintenance-{}'.format(self.command)
+                subprocess.check_call([syscommand])
+            except subprocess.CalledProcessError as e:
+                print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+                print(e)
+            except OSError as e:
+                print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
+                pass
+            else:
+                if save_data_lock.aquire():
+                    if not task in data:
+                        data[task] = {}
+                    data[task]["last"] = str(datetime.datetime.now())
+                    save_data()
+                else:
+                    print("Error locking!")
+                save_data_lock.release()
 
 
 def print_tasks(tasks):
@@ -85,8 +97,6 @@ def main():
         tasks = json.load(f)
     print_tasks(tasks)
 
-    statusfile = os.path.expanduser("~/.local/share/maintenance.js")
-    data = {}
     if os.path.isfile(statusfile):
         with open(statusfile) as f:
             data = json.load(f)
@@ -102,17 +112,14 @@ def main():
         if not needs:
             continue
 
-        perform(command, attributes, options, data, statusfile)
+        thread = Task(command, attributes, options)
+        thread.start()
+        thread.join()
 
 
-def save_data(statusfile, data):
+def save_data():
     """
     Saves all the data.
-
-    :param statusfile: Filename of status file.
-    :type statusfile: str
-    :param data: Data to save.
-    :type: list
     """
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
