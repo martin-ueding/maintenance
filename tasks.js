@@ -95,7 +95,7 @@
         "interval": 30
     }, 
     "vimrc": {
-        "disk": false, 
+        "disk": true, 
         "internet": true, 
         "interval": 1
     }, 
