@@ -124,11 +124,6 @@
         "internet": false, 
         "interval": 365
     }, 
-    "virus-scan-Bilder-2002": {
-        "disk": true, 
-        "internet": false, 
-        "interval": 365
-    }, 
     "virus-scan-Bilder-2003": {
         "disk": true, 
         "internet": false, 
