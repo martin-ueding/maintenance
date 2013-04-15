@@ -5,13 +5,13 @@ SH := /bin/bash
 all:
 
 install:
-	for folder in annually daily monthly quarterly weekly; \
+	install -d "$(DESTDIR)/usr/bin"; \
+	for task in tasks/*; \
 		do \
-		install -d "$(DESTDIR)/usr/share/maintenance/$$folder"; \
-		cp "$$folder/"* "$(DESTDIR)/usr/share/maintenance/$$folder"; \
+		install -d "$(DESTDIR)/usr/bin"; \
+		install "$$task" -t "$(DESTDIR)/usr/bin"; \
 		done
 #
-	install -d "$(DESTDIR)/usr/bin"
 	install maintenance -t "$(DESTDIR)/usr/bin"
 	install my-clamscan -t "$(DESTDIR)/usr/bin"
 
