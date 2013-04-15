@@ -15,8 +15,8 @@ install:
 	install maintenance -t "$(DESTDIR)/usr/bin"
 	install my-clamscan -t "$(DESTDIR)/usr/bin"
 #
-	install -d "$(DESTDIR)/etc"
-	install -m 644 tasks.js -t "$(DESTDIR)/etc"
+	install -d "$(DESTDIR)/etc/maintenance"
+	install -m 644 tasks.js -t "$(DESTDIR)/etc/maintenance"
 
 .PHONY: clean
 clean:

@@ -72,7 +72,7 @@ def print_tasks(tasks):
 def main():
     options = _parse_args()
 
-    taskfile = 'tasks.js'
+    taskfile = '/etc/maintenance/tasks.js'
     tasks = {}
     with open(taskfile) as f:
         tasks = json.load(f)
