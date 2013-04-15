@@ -13,6 +13,7 @@ import os.path
 import subprocess
 import sys
 import xml.dom.minidom
+import prettytable
 
 import colorcodes
 
@@ -20,14 +21,28 @@ __docformat__ = "restructuredtext en"
 
 _c = colorcodes.Colorcodes()
 
-xmlfile = 'tasks.xml'
+def getText(node):
+    return node.childNodes[0].data
 
-with open(xmlfile) as f:
-    dom = xml.dom.minidom.parse(f)
+def hasChild(node, child):
+    children = node.getElementsByTagName(child)
+    return len(children) > 0
 
-print(dom)
+class Task(object):
+    def __init__(self, node):
+        command = node.getElementsByTagName('command')[0]
+        self.command = getText(command)
+        self.interval = int(node.getAttribute('interval'))
+        self.disk = hasChild(node, 'disk')
+        self.internet = hasChild(node, 'internet')
 
-sys.exit(0)
+    def __str__(self):
+        return '{command} {interval} {disk} {internet}'.format(
+            command=self.command,
+            interval=self.interval,
+            disk=self.disk,
+            internet=self.internet,
+        )
 
 def perform(command, dry, data, statusfile):
     """
@@ -60,12 +75,41 @@ def perform(command, dry, data, statusfile):
 
             data[task]["last"] = str(datetime.datetime.now())
 
-            save_data(statusfile, data)
-    print()
+def print_tasks(tasks):
+    table = prettytable.PrettyTable(['command', 'interval', 'disk', 'internet'])
+    table.align['command'] = 'l'
+    table.align['interval'] = 'r'
+    table.align['disk'] = 'l'
+    table.align['internet'] = 'l'
+    for task in tasks:
+        table.add_row([task.command, task.interval, task.disk, task.internet])
+    print(table)
 
 
 def main():
     options = _parse_args()
+
+    xmlfile = 'tasks.xml'
+
+    with open(xmlfile) as f:
+        dom = xml.dom.minidom.parse(f)
+
+    nodes = dom.getElementsByTagName('task')
+    tasks = [Task(node) for node in nodes]
+
+    js = {}
+
+    for task in tasks:
+        js[task.command] = {
+            'interval': task.interval,
+            'disk': task.disk,
+            'internet': task.internet,
+        }
+
+    print(js)
+
+    with open('tasks.js', 'w') as f:
+        json.dump(js, f, indent=4, sort_keys=True)
 
     sharedir = "/usr/share/maintenance"
 
@@ -109,16 +153,6 @@ def main():
                 if not needs:
                     continue
 
-                perform(command, options.dry, data, statusfile)
-
-    else:
-        # Do what the user told.
-        for periodic in options.periodics:
-            periodic_dir = os.path.join(sharedir, periodic)
-            for task in os.listdir(periodic_dir):
-                if task.startswith("."):
-                    continue
-                command = os.path.join(periodic, task)
                 perform(command, options.dry, data, statusfile)
 
 def save_data(statusfile, data):
@@ -169,7 +203,6 @@ def _parse_args():
     :rtype: Namespace
     """
     parser = argparse.ArgumentParser(description="Runs periodic tasks and logs that they are done.")
-    parser.add_argument("periodics", metavar="periodics", type=str, nargs="*", help="If any of these are specified, overrides the automatic selection. Possible values: daily, weekly, monthly, quarterly")
     parser.add_argument("-n", action="store_true", dest="dry", default=False, help="Dry run, only show what would be done.")
     parser.add_argument("-f", action="store_true", help="Run even without power and internet connection.")
 
