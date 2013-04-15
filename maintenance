@@ -23,12 +23,11 @@ __docformat__ = "restructuredtext en"
 _c = colorcodes.Colorcodes()
 
 statusfile = os.path.expanduser("~/.local/share/maintenance.js")
-data = {}
 save_data_lock = threading.Lock()
 print_lock = threading.Lock()
 
 class Task(threading.Thread):
-    def __init__(self, command, attributes, options):
+    def __init__(self, command, attributes, options, data):
         """
         :param command: Command to run.
         :type command: str
@@ -41,6 +40,7 @@ class Task(threading.Thread):
         self.command = command
         self.attributes = attributes
         self.options = options
+        self.data = data
 
     def run(self):
         """
@@ -72,19 +72,19 @@ class Task(threading.Thread):
                 pass
             else:
                 if save_data_lock.acquire():
-                    if not task in data:
-                        data[task] = {}
-                    data[task]["last"] = str(datetime.datetime.now())
-                    save_data()
+                    if not task in self.data:
+                        self.data[task] = {}
+                    self.data[task]["last"] = str(datetime.datetime.now())
+                    save_data(self.data)
+                    save_data_lock.release()
                 else:
                     print("Error locking!")
-                save_data_lock.release()
 
 
         if print_lock.acquire():
             for line in output:
                 print(line)
-        print_lock.release()
+            print_lock.release()
 
 
 def print_tasks(tasks):
@@ -132,6 +132,7 @@ def main():
     with open(taskfile) as f:
         tasks = json.load(f)
 
+    data = {}
     if os.path.isfile(statusfile):
         with open(statusfile) as f:
             data = json.load(f)
@@ -151,7 +152,7 @@ def main():
         if not needs:
             continue
 
-        thread = Task(command, attributes, options) 
+        thread = Task(command, attributes, options, data) 
         if attributes['disk']:
             threads_disk.append(thread)
         else:
@@ -185,7 +186,7 @@ def main():
     progress_thread.join()
 
 
-def save_data():
+def save_data(data):
     """
     Saves all the data.
     """
@@ -205,17 +206,13 @@ def pre_check():
     with open("/sys/class/power_supply/AC/online") as f:
         powered = int(f.read()) != 0
 
-    if not powered:
-        print(_c.red + "Power not connected." + _c.reset)
-        #return False
-
     connected = False
 
     try:
         subprocess.check_output(["ping", "-c", "1", "-w", "2",
                                  "martin-ueding.de"])
     except subprocess.CalledProcessError:
-        print(_c.red + "No internet connection." + _c.reset)
+        pass
     else:
         connected = True
 
