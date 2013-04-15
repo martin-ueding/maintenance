@@ -4,4 +4,4 @@
 set -e
 set -u
 
-./my-clamscan "$HOME/Backup"
+my-clamscan "$HOME/Backup"

@@ -6,4 +6,4 @@ set -u
 
 shopt -s extglob
 
-./my-clamscan ~/.!(|.|Private|VirtualBox)
+my-clamscan ~/.!(|.|Private|VirtualBox)

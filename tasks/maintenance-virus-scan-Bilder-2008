@@ -4,4 +4,4 @@
 set -e
 set -u
 
-./my-clamscan "$HOME/Bilder/Bilder_Datenbank/2008"
+my-clamscan "$HOME/Bilder/Bilder_Datenbank/2008"

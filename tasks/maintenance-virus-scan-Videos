@@ -4,4 +4,4 @@
 set -e
 set -u
 
-./my-clamscan "$HOME/Videos"
+my-clamscan "$HOME/Videos"

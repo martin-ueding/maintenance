@@ -4,4 +4,4 @@
 set -e
 set -u
 
-./my-clamscan "$HOME/Branches"
+my-clamscan "$HOME/Branches"

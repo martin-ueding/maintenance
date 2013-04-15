@@ -6,4 +6,4 @@ set -u
 
 shopt -s extglob
 
-./my-clamscan "$HOME/Bilder/"!(Bilder_Datenbank)
+my-clamscan "$HOME/Bilder/"!(Bilder_Datenbank)

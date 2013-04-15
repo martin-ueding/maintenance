@@ -4,4 +4,4 @@
 set -e
 set -u
 
-./my-clamscan "$HOME/PDF_Source"
+my-clamscan "$HOME/PDF_Source"

@@ -4,4 +4,4 @@
 set -e
 set -u
 
-./my-clamscan "$HOME/VM_share"
+my-clamscan "$HOME/VM_share"
