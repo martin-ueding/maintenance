@@ -70,6 +70,7 @@ check-folder() {
 				if ! git push "$remote" --mirror
 				then
 					echo -e "${red}Push failed.$reset"
+				fi
 			else
 				echo -e "${green}OK${reset}\t$remote\t$foldername"
 			fi
