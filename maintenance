@@ -54,8 +54,8 @@ def perform(command, attributes, dry, data, statusfile):
         else:
             if not task in data:
                 data[task] = {}
-
             data[task]["last"] = str(datetime.datetime.now())
+            save_data(statusfile, data)
 
 
 def print_tasks(tasks):
