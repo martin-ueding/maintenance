@@ -34,6 +34,11 @@
         "internet": false, 
         "interval": 1
     }, 
+    "goutputstream": {
+        "disk": false, 
+        "internet": false, 
+        "interval": 7
+    }, 
     "installed-packages": {
         "disk": true, 
         "internet": false, 
