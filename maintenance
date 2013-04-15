@@ -20,6 +20,7 @@ __docformat__ = "restructuredtext en"
 
 _c = colorcodes.Colorcodes()
 
+
 def perform(command, dry, data, statusfile):
     """
     Performs a single task.
@@ -51,6 +52,7 @@ def perform(command, dry, data, statusfile):
                 data[task] = {}
 
             data[task]["last"] = str(datetime.datetime.now())
+
 
 def print_tasks(tasks):
     fields = list(list(tasks.items())[0][1].keys())
@@ -98,6 +100,7 @@ def main():
 
         perform(command, options.dry, data, statusfile)
 
+
 def save_data(statusfile, data):
     """
     Saves all the data.
@@ -109,6 +112,7 @@ def save_data(statusfile, data):
     """
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
+
 
 def pre_check():
     """
@@ -138,6 +142,7 @@ def pre_check():
 
     return connected and powered
 
+
 def _parse_args():
     """
     Parses the command line arguments.
@@ -150,6 +155,7 @@ def _parse_args():
     parser.add_argument("-f", action="store_true", help="Run even without power and internet connection.")
 
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     main()
