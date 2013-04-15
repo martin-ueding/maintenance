@@ -42,6 +42,7 @@ public = [
     'git-tarball',
     'latex-edit',
     'legacy-file-formats',
+    'lock-and-off',
     'maintenance',
     'mp3-packer',
     'multiimage',
