@@ -224,7 +224,7 @@
         "internet": false, 
         "interval": 7
     }, 
-    "virus-scan-VM_Share": {
+    "virus-scan-VM_share": {
         "disk": true, 
         "internet": false, 
         "interval": 7
