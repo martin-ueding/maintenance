@@ -14,6 +14,7 @@ import prettytable
 import subprocess
 import sys
 import threading
+import time
 
 import colorcodes
 
@@ -24,6 +25,7 @@ _c = colorcodes.Colorcodes()
 statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 data = {}
 save_data_lock = threading.Lock()
+print_lock = threading.Lock()
 
 class Task(threading.Thread):
     def __init__(self, command, attributes, options):
@@ -45,29 +47,31 @@ class Task(threading.Thread):
         Performs a single task.
         """
         task = os.path.basename(self.command)
-        print()
-        print(_c.bold + task + _c.reset)
-        print(_c.bold + ("="*len(task)) + _c.reset)
-        print()
+        output = [] 
+        run = True
+
+        output.append("")
+        output.append(_c.bold + task + _c.reset)
+        output.append(_c.bold + ("="*len(task)) + _c.reset)
 
         internet, power = pre_check()
 
         if (self.attributes['internet'] and not internet) or self.options.f:
-            print("Aborting this task. You can use “-f” to run it anyway.")
-            return
+            run = False
+            output = "Aborting this task. You can use “-f” to run it anyway."
 
-        if not self.options.dry:
+        if run and not self.options.dry:
             try:
                 syscommand = 'maintenance-{}'.format(self.command)
-                subprocess.check_call([syscommand])
+                output.append(subprocess.check_output([syscommand]).decode())
             except subprocess.CalledProcessError as e:
-                print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
-                print(e)
+                output.append(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+                output.append(e)
             except OSError as e:
-                print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
+                output.append(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
                 pass
             else:
-                if save_data_lock.aquire():
+                if save_data_lock.acquire():
                     if not task in data:
                         data[task] = {}
                     data[task]["last"] = str(datetime.datetime.now())
@@ -75,6 +79,12 @@ class Task(threading.Thread):
                 else:
                     print("Error locking!")
                 save_data_lock.release()
+
+
+        if print_lock.acquire():
+            for line in output:
+                print(line)
+        print_lock.release()
 
 
 def print_tasks(tasks):
@@ -87,6 +97,32 @@ def print_tasks(tasks):
 
     print(table)
 
+class ProgressThread(threading.Thread):
+    def __init__(self, thread_list):
+        super().__init__()
+        self.thread_list = thread_list
+        self.keep_running = True
+
+    def run(self):
+        old_output = ""
+        while self.keep_running:
+            alive = []
+
+            for thread in self.thread_list:
+                if not thread.is_alive():
+                    continue
+                alive.append(thread.command)
+
+            output = ", ".join(sorted(alive))
+
+            if output != old_output:
+                old_output = output
+                if print_lock.acquire():
+                    print(_c.green + "Running:", output + _c.reset)
+                print_lock.release()
+
+            time.sleep(1)
+
 
 def main():
     options = _parse_args()
@@ -95,11 +131,14 @@ def main():
     tasks = {}
     with open(taskfile) as f:
         tasks = json.load(f)
-    print_tasks(tasks)
 
     if os.path.isfile(statusfile):
         with open(statusfile) as f:
             data = json.load(f)
+
+    print(data)
+
+    sys.exit(0)
 
     threads_disk = []
     threads_nodisk = []
@@ -120,14 +159,40 @@ def main():
         else:
             threads_nodisk.append(thread)
 
-    print(threads_disk)
-    print(threads_nodisk)
+    print("Tasks that are done this session:")
+    print()
+    tasks = sorted([thread.command for thread in threads_disk + threads_nodisk])
+    for task in tasks:
+        print("-", task)
+    print()
+
+    progress_thread = ProgressThread(threads_disk + threads_nodisk)
+    progress_thread.start()
+
+    # Start all the threads that do not use the disk very much.
+    for thread in threads_nodisk:
+        thread.start()
+
+    # Start one thread that uses the disk and wait for that.
+    for thread in threads_disk:
+        break
+        thread.start()
+        thread.join()
+
+    # Wait for all other threads. I guess that they will have finished by then
+    # anyway.
+    for thread in threads_nodisk:
+        thread.join()
+
+    progress_thread.keep_running = False
+    progress_thread.join()
 
 
 def save_data():
     """
     Saves all the data.
     """
+    print("Saving", data)
     with open(statusfile, "w") as f:
         json.dump(data, f, indent=4, sort_keys=True)
 
