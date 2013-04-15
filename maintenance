@@ -12,7 +12,6 @@ import os
 import os.path
 import subprocess
 import sys
-import xml.dom.minidom
 import prettytable
 
 import colorcodes
@@ -20,29 +19,6 @@ import colorcodes
 __docformat__ = "restructuredtext en"
 
 _c = colorcodes.Colorcodes()
-
-def getText(node):
-    return node.childNodes[0].data
-
-def hasChild(node, child):
-    children = node.getElementsByTagName(child)
-    return len(children) > 0
-
-class Task(object):
-    def __init__(self, node):
-        command = node.getElementsByTagName('command')[0]
-        self.command = getText(command)
-        self.interval = int(node.getAttribute('interval'))
-        self.disk = hasChild(node, 'disk')
-        self.internet = hasChild(node, 'internet')
-
-    def __str__(self):
-        return '{command} {interval} {disk} {internet}'.format(
-            command=self.command,
-            interval=self.interval,
-            disk=self.disk,
-            internet=self.internet,
-        )
 
 def perform(command, dry, data, statusfile):
     """
@@ -62,7 +38,8 @@ def perform(command, dry, data, statusfile):
     print(_c.bold + ("="*len(task)) + _c.reset)
     if not dry:
         try:
-            subprocess.check_call([command])
+            syscommand = 'maintenance-{}'.format(command)
+            subprocess.check_call([syscommand])
         except subprocess.CalledProcessError as e:
             print(_c.red + "Error in {command}:".format(command=command) + _c.reset)
             print(e)
@@ -76,40 +53,24 @@ def perform(command, dry, data, statusfile):
             data[task]["last"] = str(datetime.datetime.now())
 
 def print_tasks(tasks):
-    table = prettytable.PrettyTable(['command', 'interval', 'disk', 'internet'])
-    table.align['command'] = 'l'
+    fields = list(list(tasks.items())[0][1].keys())
+    table = prettytable.PrettyTable(['command'] + fields)
+    table.align = 'l'
     table.align['interval'] = 'r'
-    table.align['disk'] = 'l'
-    table.align['internet'] = 'l'
-    for task in tasks:
-        table.add_row([task.command, task.interval, task.disk, task.internet])
+    for command, task in sorted(tasks.items()):
+        table.add_row([command] + list(task.values()))
+
     print(table)
 
 
 def main():
     options = _parse_args()
 
-    xmlfile = 'tasks.xml'
-
-    with open(xmlfile) as f:
-        dom = xml.dom.minidom.parse(f)
-
-    nodes = dom.getElementsByTagName('task')
-    tasks = [Task(node) for node in nodes]
-
-    js = {}
-
-    for task in tasks:
-        js[task.command] = {
-            'interval': task.interval,
-            'disk': task.disk,
-            'internet': task.internet,
-        }
-
-    print(js)
-
-    with open('tasks.js', 'w') as f:
-        json.dump(js, f, indent=4, sort_keys=True)
+    taskfile = 'tasks.js'
+    tasks = {}
+    with open(taskfile) as f:
+        tasks = json.load(f)
+    print_tasks(tasks)
 
     sharedir = "/usr/share/maintenance"
 
@@ -120,40 +81,22 @@ def main():
     statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 
     data = {}
-
     if os.path.isfile(statusfile):
         with open(statusfile) as f:
             data = json.load(f)
 
-    if len(options.periodics) == 0:
-        # Automatic modus.
-        for periodic in ["daily", "weekly", "monthly", "quarterly", "annually"]:
-            periodic_dir = os.path.join(sharedir, periodic)
-            for task in os.listdir(periodic_dir):
-                if task.startswith("."):
-                    continue
+    for command, attributes in tasks.items():
+        needs = True
 
-                command = os.path.join(periodic_dir, task)
+        if task in data:
+            diff = datetime.datetime.now() - dateutil.parser.parse(data[command]["last"])
+            if diff < datetime.timedelta(attributes['interval']):
+                needs = False
 
-                needs = True
+        if not needs:
+            continue
 
-                if task in data:
-                    diff = datetime.datetime.now() - dateutil.parser.parse(data[task]["last"])
-                    if periodic == "daily" and diff < datetime.timedelta(1):
-                        needs = False
-                    elif periodic == "weekly" and diff < datetime.timedelta(7):
-                        needs = False
-                    elif periodic == "monthly" and diff < datetime.timedelta(30):
-                        needs = False
-                    elif periodic == "quarterly" and diff < datetime.timedelta(90):
-                        needs = False
-                    elif periodic == "annually" and diff < datetime.timedelta(360):
-                        needs = False
-
-                if not needs:
-                    continue
-
-                perform(command, options.dry, data, statusfile)
+        perform(command, options.dry, data, statusfile)
 
 def save_data(statusfile, data):
     """
