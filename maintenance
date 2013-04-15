@@ -12,12 +12,22 @@ import os
 import os.path
 import subprocess
 import sys
+import xml.dom.minidom
 
 import colorcodes
 
 __docformat__ = "restructuredtext en"
 
 _c = colorcodes.Colorcodes()
+
+xmlfile = 'tasks.xml'
+
+with open(xmlfile) as f:
+    dom = xml.dom.minidom.parse(f)
+
+print(dom)
+
+sys.exit(0)
 
 def perform(command, dry, data, statusfile):
     """
