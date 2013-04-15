@@ -101,6 +101,8 @@ def main():
         with open(statusfile) as f:
             data = json.load(f)
 
+    threads_disk = []
+    threads_nodisk = []
     for command, attributes in tasks.items():
         needs = True
 
@@ -112,9 +114,14 @@ def main():
         if not needs:
             continue
 
-        thread = Task(command, attributes, options)
-        thread.start()
-        thread.join()
+        thread = Task(command, attributes, options) 
+        if attributes['disk']:
+            threads_disk.append(thread)
+        else:
+            threads_nodisk.append(thread)
+
+    print(threads_disk)
+    print(threads_nodisk)
 
 
 def save_data():
