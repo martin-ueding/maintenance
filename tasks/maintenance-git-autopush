@@ -67,7 +67,9 @@ check-folder() {
 			if (( lines > 0 ))
 			then
 				echo -e "${orange}DIRTY${reset}\t$remote\t$foldername"
-				git push "$remote" --mirror
+				if ! git push "$remote" --mirror
+				then
+					echo -e "${red}Push failed.$reset"
 			else
 				echo -e "${green}OK${reset}\t$remote\t$foldername"
 			fi
