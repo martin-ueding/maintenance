@@ -37,17 +37,19 @@ def perform(command, attributes, dry, data, statusfile):
     :type statusfile: str
     """
     task = os.path.basename(command)
+    print()
     print(_c.bold + task + _c.reset)
     print(_c.bold + ("="*len(task)) + _c.reset)
+    print()
     if not dry:
         try:
             syscommand = 'maintenance-{}'.format(command)
             subprocess.check_call([syscommand])
         except subprocess.CalledProcessError as e:
-            print(_c.red + "Error in {command}:".format(command=command) + _c.reset)
+            print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
             print(e)
         except OSError as e:
-            print(_c.red + "Could not execute {command}.".format(command=command) + _c.reset)
+            print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
             pass
         else:
             if not task in data:
