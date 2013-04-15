@@ -63,7 +63,7 @@ class Task(threading.Thread):
         if run and not self.options.dry:
             try:
                 syscommand = 'maintenance-{}'.format(self.command)
-                output.append(subprocess.check_output([syscommand]).decode())
+                output.append(subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode())
             except subprocess.CalledProcessError as e:
                 output.append(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
                 output.append(e)
@@ -207,7 +207,7 @@ def pre_check():
 
     try:
         subprocess.check_output(["ping", "-c", "1", "-w", "2",
-                                 "martin-ueding.de"])
+                                 "martin-ueding.de"], stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
         pass
     else:
