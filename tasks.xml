@@ -1,3 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Copyright © 2013 Martin Ueding <dev@martin-ueding.de> -->
 <tasks>
-	<task disk internet interval="7">maintenance-ppa</task>
+	<task interval="1" disk internet>maintenance-git-autopush</task>
+	<task interval="1" disk>maintenance-backup-chaos</task>
+	<task interval="1" disk>maintenance-installed-packages</task>
+	<task interval="1" disk>maintenance-mysql-history</task>
+	<task interval="1" internet>maintenance-notes-download</task>
+	<task interval="1" internet>maintenance-vimrc</task>
+	<task interval="1">maintenance-gnuplot-history</task>
+	<task interval="1">maintenance-lesshst</task>
+	<task interval="1">maintenance-php-history</task>
+	<task interval="1">maintenance-qkey</task>
+	<task interval="7" disk internet>maintenance-ppa</task>
+	<task interval="7" disk>maintenance-legacy-file-formats</task>
+	<task interval="7" disk>maintenance-okular-docdata</task>
+	<task interval="7" disk>maintenance-thumbnails</task>
+	<task interval="7" disk>maintenance-virus-scan-bin</task>
+	<task interval="7" disk>maintenance-virus-scan-Downloads</task>
+	<task interval="7" disk>maintenance-virus-scan-Thunderbird</task>
+	<task interval="7" disk>maintenance-virus-scan-TODO</task>
+	<task interval="7" disk>maintenance-virus-scan-VM_Share</task>
+	<task interval="7" internet>maintenance-backup-webservers</task>
+	<task interval="7" internet>maintenance-copy-korrigiert</task>
+	<task interval="30" disk>maintenance-git-gc</task>
+	<task interval="30" disk>maintenance-unison-cleanup</task>
+	<task interval="30" disk>maintenance-virus-scan-Branches</task>
+	<task interval="30" disk>maintenance-virus-scan-Dokumente</task>
+	<task interval="30" disk>maintenance-virus-scan-Packaging</task>
+	<task interval="30" disk>maintenance-virus-scan-Vorlagen</task>
+	<task interval="90" disk>maintenance-compress-tarball</task>
+	<task interval="90" disk>maintenance-octave-core-cleanup</task>
+	<task interval="90" disk>maintenance-virus-scan-Backup</task>
+	<task interval="90" disk>maintenance-virus-scan-Bilder-2013</task>
+	<task interval="90" disk>maintenance-virus-scan-Bilder</task>
+	<task interval="90" disk>maintenance-virus-scan-dotfiles</task>
+	<task interval="90" disk>maintenance-virus-scan-Installer</task>
+	<task interval="90" disk>maintenance-virus-scan-Musik</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-0000</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-1999</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2001</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2002</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2003</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2003</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2004</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2005</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2006</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2007</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2008</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2009</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2010</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2011</task>
+	<task interval="365" disk>maintenance-virus-scan-Bilder-2012</task>
+	<task interval="365" disk>maintenance-virus-scan-PDF_Source</task>
+	<task interval="365" disk>maintenance-virus-scan-Videos</task>
 </tasks>
