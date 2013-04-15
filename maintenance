@@ -89,7 +89,7 @@ def main():
     for command, attributes in tasks.items():
         needs = True
 
-        if task in data:
+        if command in data:
             diff = datetime.datetime.now() - dateutil.parser.parse(data[command]["last"])
             if diff < datetime.timedelta(attributes['interval']):
                 needs = False
