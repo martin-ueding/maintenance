@@ -21,7 +21,7 @@ __docformat__ = "restructuredtext en"
 _c = colorcodes.Colorcodes()
 
 
-def perform(command, attributes, dry, data, statusfile):
+def perform(command, attributes, options, data, statusfile):
     """
     Performs a single task.
 
@@ -41,7 +41,14 @@ def perform(command, attributes, dry, data, statusfile):
     print(_c.bold + task + _c.reset)
     print(_c.bold + ("="*len(task)) + _c.reset)
     print()
-    if not dry:
+
+    internet, power = pre_check()
+
+    if not ((internet and attributes['internet']) or options.f):
+        print("Aborting this task. You can use “-f” to run it anyway.")
+        return
+
+    if not options.dry:
         try:
             syscommand = 'maintenance-{}'.format(command)
             subprocess.check_call([syscommand])
@@ -78,10 +85,6 @@ def main():
         tasks = json.load(f)
     print_tasks(tasks)
 
-    if not all(pre_check()) and not options.f:
-        print("Aborting. You can use “-f” to run anyway.")
-        sys.exit(1)
-
     statusfile = os.path.expanduser("~/.local/share/maintenance.js")
     data = {}
     if os.path.isfile(statusfile):
@@ -99,7 +102,7 @@ def main():
         if not needs:
             continue
 
-        perform(command, attributes, options.dry, data, statusfile)
+        perform(command, attributes, options, data, statusfile)
 
 
 def save_data(statusfile, data):
