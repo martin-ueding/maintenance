@@ -12,6 +12,7 @@ Launchpad PPA are up do date.
 
 import argparse
 import functools
+import json
 import os
 import platform
 import re
@@ -30,42 +31,7 @@ Ubuntu release that the packages should be on.
 
 packages = sorted(os.listdir(os.path.expanduser('~/Packaging')))
 
-public = [
-
-    'a4-scan',
-    'adium2pidgin',
-    'bogomips'
-    'chaos-repos',
-    'copyright-updater',
-    'email-rename',
-    'git-changelog',
-    'git-ignore-untracked',
-    'git-tarball',
-    'latex-edit',
-    'legacy-file-formats',
-    'lock-and-off',
-    'maintenance',
-    'mp3-packer',
-    'multiimage',
-    'open-in-browser',
-    'pdflatex-multifont',
-    'php-note-capture',
-    'project-ubernahme',
-    'python-colorcodes',
-    'python-unitprint',
-    'risk-auto-dice',
-    'template-spawner',
-    'tex-keywordprg',
-    'think-rotate',
-    'type-speed',
-    'unwrap-pdf-to-jpeg',
-    'urt-launcher',
-    'van-allen-sim-3d',
-    'vim-headings',
-    'vim-regex-collecion',
-    'xournal-page-count',
-
-]
+public = []
 '''
 List of packages that should be uploaded.
 '''
@@ -304,6 +270,13 @@ def main():
 
     if options.dry_run:
         subprocess.check_call = p
+
+    publicfile = os.path.expanduser('~/.config/maintenance/public.js')
+
+    if os.path.isfile(publicfile):
+        with open(publicfile) as f:
+            global public
+            public = json.load(f)
 
     for name in packages:
         try:
