@@ -35,6 +35,7 @@ public = [
     'a4-scan',
     'adium2pidgin',
     'bogomips'
+    'chaos-repos',
     'copyright-updater',
     'email-rename',
     'git-changelog',
@@ -50,13 +51,18 @@ public = [
     'pdflatex-multifont',
     'php-note-capture',
     'project-ubernahme',
+    'python-colorcodes',
+    'python-unitprint',
     'risk-auto-dice',
     'template-spawner',
     'tex-keywordprg',
     'think-rotate',
+    'type-speed',
     'unwrap-pdf-to-jpeg',
+    'urt-launcher',
     'van-allen-sim-3d',
     'vim-headings',
+    'vim-regex-collecion',
     'xournal-page-count',
 
 ]
