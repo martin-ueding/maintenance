@@ -202,9 +202,12 @@ def pre_check():
     :return: Whether internet and power are connected.
     :rtype: tuple
     """
-    powered = False
-    with open("/sys/class/power_supply/AC/online") as f:
-        powered = int(f.read()) != 0
+    powered = True
+
+    powerfile = "/sys/class/power_supply/AC/online"
+    if os.path.isfile(powerfile):
+        with open(powerfile) as f:
+            powered = int(f.read()) != 0
 
     connected = False
 
