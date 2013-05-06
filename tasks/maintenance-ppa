@@ -295,6 +295,7 @@ def main():
         print('-----------------')
         print()
         print("sudo dpkg -i {}".format(" ".join(upgrades)))
+        subprocess.check_call(["pkexec", "dpkg", "-i"] + upgrades)
 
 
 def _parse_args():
