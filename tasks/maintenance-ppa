@@ -294,8 +294,10 @@ def main():
         print('possible upgrades')
         print('-----------------')
         print()
-        print("sudo dpkg -i {}".format(" ".join(upgrades)))
-        subprocess.call(["pkexec", "dpkg", "-i"] + upgrades)
+        command = ["pkexec", "dpkg", "-i"] + upgrades
+        print(" ".join(command))
+        print()
+        subprocess.call(command)
 
 
 def _parse_args():
