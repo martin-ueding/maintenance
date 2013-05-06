@@ -93,9 +93,9 @@ class Package(object):
         needs_upgrade, installed, latest = self.needs_upgrade()
         if needs_upgrade:
             print(_c.orange + 'This package needs upgrading, {} → {}'.format(installed, latest) + _c.reset)
-            upgrades.append('dpkg -i {}'.format(
+            upgrades.append(
                 os.path.join(basedir, self.name, self.get_latest('.deb'))
-            ))
+            )
 
     def build(self, source=True):
         '''
@@ -294,8 +294,7 @@ def main():
         print('possible upgrades')
         print('-----------------')
         print()
-        for upgrade in upgrades:
-            print(upgrade)
+        print("sudo dpkg -i {}".format(" ".join(upgrades)))
 
 
 def _parse_args():
