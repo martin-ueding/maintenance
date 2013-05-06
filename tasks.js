@@ -5,6 +5,12 @@
 		"interval": 1,
 		"local": false
 	}, 
+	"backup-status": {
+		"disk": false, 
+		"internet": true, 
+		"interval": 1,
+		"local": false
+	}, 
 	"backup-webservers": {
 		"disk": false, 
 		"internet": true, 
