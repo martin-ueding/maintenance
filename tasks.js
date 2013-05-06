@@ -65,6 +65,12 @@
 		"interval": 1,
 		"local": true
 	}, 
+	"mp3-packer": {
+		"disk": false, 
+		"internet": false, 
+		"interval": 5,
+		"local": false
+	}, 
 	"mysql-history": {
 		"disk": true, 
 		"internet": false, 
