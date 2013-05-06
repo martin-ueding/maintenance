@@ -41,6 +41,7 @@ class Task(threading.Thread):
         self.attributes = attributes
         self.options = options
         self.data = data
+        self.done = False
 
     def run(self):
         """
@@ -86,6 +87,8 @@ class Task(threading.Thread):
                 print(line)
             print_lock.release()
 
+        self.done = True
+
 
 def print_tasks(tasks):
     fields = list(list(tasks.items())[0][1].keys())
@@ -107,18 +110,28 @@ class ProgressThread(threading.Thread):
         old_output = ""
         while self.keep_running:
             alive = []
+            waiting = []
 
             for thread in self.thread_list:
-                if not thread.is_alive():
-                    continue
-                alive.append(thread.command)
+                if thread.is_alive():
+                    alive.append(thread.command)
+                elif not thread.done:
+                    waiting.append(thread.command)
 
-            output = ", ".join(sorted(alive))
+            lines = []
+
+            if len(alive) > 0:
+                lines.append(_c.green + "Running: " + ", ".join(sorted(alive)) + _c.reset)
+            if len(waiting) > 0:
+                lines.append(_c.orange + "Waiting: " + ", ".join(sorted(waiting)) + _c.reset)
+
+            output = "\n".join(lines)
 
             if output != old_output:
                 old_output = output
                 if print_lock.acquire():
-                    print(_c.green + "Running:", output + _c.reset)
+                    print(output)
+                    print()
                     print_lock.release()
 
             time.sleep(1)
