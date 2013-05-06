@@ -101,6 +101,12 @@
 		"interval": 7,
 		"local": true
 	}, 
+	"peer-review": {
+		"disk": false, 
+		"internet": true, 
+		"interval": 1,
+		"local": false
+	}, 
 	"php-history": {
 		"disk": false, 
 		"internet": false, 
