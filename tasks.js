@@ -116,7 +116,7 @@
 	"ppa": {
 		"disk": true, 
 		"internet": true, 
-		"interval": 7,
+		"interval": 3,
 		"local": true
 	}, 
 	"qkey": {
