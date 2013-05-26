@@ -5,7 +5,6 @@
 # whether they need to be pushed.
 
 set -e
-set -u
 
 shopt -s extglob
 
@@ -41,8 +40,21 @@ fi
 
 ###############################################################################
 
+# http://stackoverflow.com/a/8574392/653152
+containsElement () {
+	local e
+	for e in "${@:2}"
+	do
+		if [[ "$e" == "$1" ]] 
+		then
+			return 0
+		fi
+	done
+	return 1
+}
+
 check-folder() {
-	local project foldername lines
+	local project foldername lines has_remotes
 
 	project="$1"
 
@@ -57,23 +69,46 @@ check-folder() {
 	foldername="${project#./}"
 	foldername="${foldername%/}"
 
+	has_remotes=()
+
 	for remote in "${remotes[@]}"
 	do
 		# Check if this is an actual remote.
 		if git remote | grep "$remote" > /dev/null
 		then
-			# Check whether this remote needs to be pushed.
-			lines="$(git log --oneline "$remote/master..master" | wc -l)"
-			if (( lines > 0 ))
+			has_remotes=("${has_remotes[@]}" "$remote")
+		fi
+	done
+
+	# If there are no remotes in this repo, there is nothing more to do.
+	if (( ${#has_remotes[@]} == 0 ))
+	then
+		return 0
+	fi
+
+	for remote in "${remotes[@]}"
+	do
+		if ! containsElement "$remote" "${has_remotes[@]}"
+		then
+			echo -e "${blue}INIT${reset}\t$remote\t$foldername"
+			git "push-$remote" "${foldername##*/}"
+		fi
+	done
+
+
+	for remote in "${has_remotes[@]}"
+	do
+		# Check whether this remote needs to be pushed.
+		lines="$(git log --oneline "$remote/master..master" | wc -l)"
+		if (( lines > 0 ))
+		then
+			echo -e "${orange}DIRTY${reset}\t$remote\t$foldername"
+			if ! git push "$remote" --mirror
 			then
-				echo -e "${orange}DIRTY${reset}\t$remote\t$foldername"
-				if ! git push "$remote" --mirror
-				then
-					echo -e "${red}Push failed.$reset"
-				fi
-			else
-				echo -e "${green}OK${reset}\t$remote\t$foldername"
+				echo -e "${red}Push failed.$reset"
 			fi
+		else
+			echo -e "${green}OK${reset}\t$remote\t$foldername"
 		fi
 	done
 }
