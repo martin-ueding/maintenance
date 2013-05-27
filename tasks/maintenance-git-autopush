@@ -90,8 +90,8 @@ check-folder() {
 	do
 		if ! containsElement "$remote" "${has_remotes[@]}"
 		then
-			echo -e "${blue}INIT${reset}\t$remote\t$foldername"
-			git "push-$remote" "${foldername##*/}"
+			echo -e "${RED}INIT${reset}\t$remote\t$foldername"
+			#git "push-$remote" "${foldername##*/}"
 		fi
 	done
 
