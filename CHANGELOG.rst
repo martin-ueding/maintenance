@@ -4,6 +4,9 @@
 changelog
 #########
 
+v1.4
+    - Show which git repos needs to be created on the remote servers.
+
 v1.3.4
     - Run PPA script more often
 
