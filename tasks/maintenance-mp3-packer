@@ -4,4 +4,4 @@
 set -e
 set -u
 
-mp3-packer "$HOME/Musik/Musik"
+mp3-packer "$HOME/Musik"
