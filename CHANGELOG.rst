@@ -4,6 +4,9 @@
 changelog
 #########
 
+v1.4.1
+    - Copy podcasts to devices
+
 v1.4
     - Show which git repos needs to be created on the remote servers.
 
