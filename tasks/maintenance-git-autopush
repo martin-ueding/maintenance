@@ -88,13 +88,23 @@ check-folder() {
 
 	for remote in "${remotes[@]}"
 	do
-		if ! containsElement "$remote" "${has_remotes[@]}"
+		if containsElement "$remote" "${has_remotes[@]}"
 		then
-			echo -e "${RED}INIT${reset}\t$remote\t$foldername"
-			#git "push-$remote" "${foldername##*/}"
+			remoteurl="$(git config --get "remote.$remote.url")"
+			remoteurl2="${remoteurl##*/}"
+			reponame="${remoteurl2%.git}"
+			break
 		fi
 	done
 
+	for remote in "${remotes[@]}"
+	do
+		if ! containsElement "$remote" "${has_remotes[@]}"
+		then
+			echo -e "${red}INIT${reset}\t$remote\t$foldername"
+			git "push-$remote" "$reponame"
+		fi
+	done
 
 	for remote in "${has_remotes[@]}"
 	do
