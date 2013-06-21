@@ -32,7 +32,7 @@
 	"git-autopush": {
 		"disk": true, 
 		"internet": true, 
-		"interval": 1,
+		"interval": 0.2,
 		"local": false
 	}, 
 	"git-gc": {
