@@ -4,6 +4,10 @@
 changelog
 #########
 
+v1.4.2
+    - Create git repos on remotes automatically, if they are missing
+    - Run git-autopush more often
+
 v1.4.1
     - Copy podcasts to devices
 
