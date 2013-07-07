@@ -112,7 +112,7 @@ check-folder() {
 		lines="$(git log --oneline "$remote/master..master" | wc -l)"
 		if (( lines > 0 ))
 		then
-			echo -e "${orange}DIRTY${reset}\t$remote\t$foldername"
+			echo -e "${orange}PUSH${reset}\t$remote\t$foldername"
 			if ! git push "$remote" --mirror
 			then
 				echo -e "${red}Push failed.$reset"
