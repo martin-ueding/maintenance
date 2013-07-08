@@ -127,3 +127,8 @@ find "$HOME/"!(Bilder|Backup) -type d -name .git | sort | while read -r git_dir
 do
 	check-folder "${git_dir%/.git}"
 done
+
+if type backup-status &> /dev/null
+then
+	backup-status update 'GitHub & Chaos' to
+fi
