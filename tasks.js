@@ -32,7 +32,7 @@
 	"dsstore": {
 		"disk": true, 
 		"internet": false, 
-		"interval": 30,
+		"interval": 90,
 		"local": true
 	}, 
 	"git-autopush": {
