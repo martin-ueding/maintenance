@@ -79,7 +79,7 @@ class Package(object):
             self.uupdate()
 
         if self.name in public:
-            if self.needs_building(True):
+            if self.needs_building(True) or self.needs_new_series():
                 self.build(True)
             try:
                 self.upload()
@@ -88,10 +88,18 @@ class Package(object):
                 self.build(True)
                 self.upload()
 
+        build_now = False
+
+        if self.needs_building(False):
+            self.build(False)
+            build_now = True
+
         needs_upgrade, installed, latest = self.needs_upgrade()
         if needs_upgrade:
             print(_c.orange + 'This package needs upgrading, {} → {}'.format(installed, latest) + _c.reset)
-            self.build(False)
+            if not build_now:
+                self.clean()
+                self.build(False)
             upgrades.append(
                 os.path.join(basedir, self.name, self.get_latest('.deb'))
             )
@@ -100,10 +108,10 @@ class Package(object):
         '''
         Builds the given package, binary or source.
         '''
-        self.clean()
-
         latest_folder = self.get_latest_folder()
 
+        if source:
+            self.bump_release()
         os.chdir(os.path.join(basedir, self.name, latest_folder, 'debian'))
         sed_command = ['sed', '-i', 's/UNRELEASED/{}/'.format(current_release), 'changelog']
         subprocess.check_call(sed_command)
@@ -121,22 +129,26 @@ class Package(object):
             print(e)
             raise PackagingError('Build failed.')
 
+    def bump_release(self):
+        if self.needs_new_series():
+            latest_folder = self.get_latest_folder()
+            os.chdir(os.path.join(basedir, self.name, latest_folder, 'debian'))
+            print(_c.orange + 'This needs to be uploaded with the new release.' + _c.reset)
+            subprocess.check_call(['pwd'])
+            subprocess.check_call(['dch', '-D', current_release, 'Rebuild for {}'.format(current_release)])
+
     def clean(self):
         '''
         Remove everything that can be build.
         '''
         suffixes = [
             '.deb',
-            '.build',
-            '.changes',
-            '.debian.tar.gz',
-            '.dsc',
         ]
 
         for suffix in suffixes:
             files = glob.glob('*{}'.format(suffix))
             for file_ in files:
-                print('Cleaning {}'.format(file_))
+                print(_c.green + 'Cleaning {}'.format(file_) + _c.reset)
                 os.unlink(file_)
 
     def export_latest(self):
@@ -190,6 +202,21 @@ class Package(object):
 
         return self.get_latest('.tar.gz', function)
 
+    def get_release(self):
+        '''
+        Checks the changelog for the Ubuntu series this package is on.
+        '''
+        changelog_file = os.path.join(self.get_latest_folder(), 'debian', 'changelog')
+
+        with open(changelog_file) as f:
+            first_line = f.readline()
+
+        m = re.match(r'.*? \(.*?\) (\w+); urgency=\w+', first_line)
+
+        if m:
+            print(m.group(1))
+            return m.group(1)
+
     def installed_version(self):
         '''
         Checks ``apt-cache`` for the installed version of the package.
@@ -221,15 +248,21 @@ class Package(object):
         os.chdir(os.path.join(basedir, self.name))
 
         latest_folder = self.get_latest_folder()
-        if source:
-            latest = self.get_latest('_source.changes')
-        else:
-            latest = self.get_latest('.deb')
+        try:
+            if source:
+                latest = self.get_latest('_source.changes')
+            else:
+                latest = self.get_latest('.deb')
+        except PackagingError:
+            return True
 
         prefix = latest[:len(latest_folder)]
         prefix = prefix[:len(self.name)] + '-' + prefix[len(self.name) + 1:]
 
         return latest_folder != prefix
+
+    def needs_new_series(self):
+        return self.get_release() != current_release
 
     def needs_upgrade(self):
         '''
