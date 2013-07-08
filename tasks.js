@@ -29,6 +29,12 @@
 		"interval": 7,
 		"local": false
 	}, 
+	"dsstore": {
+		"disk": true, 
+		"internet": false, 
+		"interval": 30,
+		"local": true
+	}, 
 	"git-autopush": {
 		"disk": true, 
 		"internet": true, 
