@@ -214,7 +214,6 @@ class Package(object):
         m = re.match(r'.*? \(.*?\) (\w+); urgency=\w+', first_line)
 
         if m:
-            print(m.group(1))
             return m.group(1)
 
     def installed_version(self):
