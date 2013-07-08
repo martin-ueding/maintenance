@@ -87,11 +87,9 @@ class Package(object):
                 self.build(True)
                 self.upload()
 
-        if self.needs_building(False):
-            self.build(False)
-
         needs_upgrade, installed, latest = self.needs_upgrade()
         if needs_upgrade:
+            self.build(False)
             print(_c.orange + 'This package needs upgrading, {} → {}'.format(installed, latest) + _c.reset)
             upgrades.append(
                 os.path.join(basedir, self.name, self.get_latest('.deb'))
