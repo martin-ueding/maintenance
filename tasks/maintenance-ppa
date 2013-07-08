@@ -12,6 +12,7 @@ Launchpad PPA are up do date.
 
 import argparse
 import functools
+import glob
 import json
 import os
 import platform
@@ -99,6 +100,8 @@ class Package(object):
         '''
         Builds the given package, binary or source.
         '''
+        self.clean()
+
         latest_folder = self.get_latest_folder()
 
         os.chdir(os.path.join(basedir, self.name, latest_folder, 'debian'))
@@ -117,6 +120,24 @@ class Package(object):
         except subprocess.CalledProcessError as e:
             print(e)
             raise PackagingError('Build failed.')
+
+    def clean(self):
+        '''
+        Remove everything that can be build.
+        '''
+        suffixes = [
+            '.deb',
+            '.build',
+            '.changes',
+            '.debian.tar.gz',
+            '.dsc',
+        ]
+
+        for suffix in suffixes:
+            files = glob.glob('*{}'.format(suffix))
+            for file_ in files:
+                print('Cleaning {}'.format(file_))
+                os.unlink(file_)
 
     def export_latest(self):
         '''
