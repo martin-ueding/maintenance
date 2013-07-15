@@ -4,6 +4,20 @@
 changelog
 #########
 
+v1.5.1
+    - Make output of blank lines consistent
+    - New task: Remove flash cookies
+
+v1.5
+    - Clean up ``.DS_Store``
+    - Improve package handling
+
+v1.4.4
+    - Let ``git-autopush`` write to ``backup-status``
+
+v1.4.3
+    - Dirty → Push
+
 v1.4.2
     - Create git repos on remotes automatically, if they are missing
     - Run git-autopush more often
