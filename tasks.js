@@ -35,6 +35,12 @@
 		"interval": 90,
 		"local": true
 	}, 
+	"flash-cookies": {
+		"disk": false, 
+		"internet": false, 
+		"interval": .5,
+		"local": true
+	}, 
 	"git-autopush": {
 		"disk": true, 
 		"internet": true, 
