@@ -26,6 +26,13 @@ statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 save_data_lock = threading.Lock()
 print_lock = threading.Lock()
 
+def print_block(lines):
+    if print_lock.acquire():
+        print()
+        for line in lines:
+            print(line)
+        print_lock.release()
+
 class Task(threading.Thread):
     def __init__(self, command, attributes, options, data):
         """
@@ -51,9 +58,9 @@ class Task(threading.Thread):
         output = [] 
         run = True
 
-        output.append("")
         output.append(_c.bold + task + _c.reset)
         output.append(_c.bold + ("="*len(task)) + _c.reset)
+        output.append("")
 
         internet, power = pre_check()
 
@@ -79,13 +86,9 @@ class Task(threading.Thread):
                     save_data(self.data)
                     save_data_lock.release()
                 else:
-                    print("Error locking!")
+                    print_block(["Error locking!"])
 
-
-        if print_lock.acquire():
-            for line in output:
-                print(line)
-            print_lock.release()
+        print_block(output)
 
         self.done = True
 
@@ -98,7 +101,7 @@ def print_tasks(tasks):
     for command, task in sorted(tasks.items()):
         table.add_row([command] + list(task.values()))
 
-    print(table)
+    print_block([table])
 
 class ProgressThread(threading.Thread):
     def __init__(self, thread_list):
@@ -129,10 +132,7 @@ class ProgressThread(threading.Thread):
 
             if output != old_output:
                 old_output = output
-                if print_lock.acquire():
-                    print(output)
-                    print()
-                    print_lock.release()
+                print_block([output])
 
             time.sleep(1)
 
@@ -172,12 +172,9 @@ def main():
         else:
             threads_nodisk.append(thread)
 
-    print("Tasks that are done this session:")
-    print()
+    print_block(["Tasks that are done this session:"])
     tasks = sorted([thread.command for thread in threads_disk + threads_nodisk])
-    for task in tasks:
-        print("-", task)
-    print()
+    print_block(["- {}".format(task) for task in tasks])
 
     progress_thread = ProgressThread(threads_disk + threads_nodisk)
     progress_thread.start()
