@@ -4,6 +4,9 @@
 changelog
 #########
 
+v1.5.2
+    - Fix JSON notation
+
 v1.5.1
     - Make output of blank lines consistent
     - New task: Remove flash cookies
