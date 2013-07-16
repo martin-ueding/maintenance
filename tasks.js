@@ -38,7 +38,7 @@
 	"flash-cookies": {
 		"disk": false, 
 		"internet": false, 
-		"interval": .5,
+		"interval": 0.5,
 		"local": true
 	}, 
 	"git-autopush": {
