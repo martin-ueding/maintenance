@@ -9,7 +9,7 @@ v1.5.2
 
 v1.5.1
     - Make output of blank lines consistent
-    - New task: Remove flash cookies
+    - *Added*: Remove flash cookies
 
 v1.5
     - Clean up ``.DS_Store``
@@ -35,7 +35,7 @@ v1.3.4
     - Run PPA script more often
 
 v1.3.3
-    - Add peer-review script
+    - *Added*: peer-review
     - Print whole command
 
 v1.3.2
