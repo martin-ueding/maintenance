@@ -4,6 +4,9 @@
 changelog
 #########
 
+v1.5.3
+    - Prevent scripts from failing
+
 v1.5.2
     - Fix JSON notation
 
