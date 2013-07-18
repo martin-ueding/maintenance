@@ -1,7 +1,7 @@
 .. Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
 
 #########
-changelog
+Changelog
 #########
 
 v1.5.3
