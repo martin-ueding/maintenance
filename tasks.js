@@ -2,7 +2,7 @@
 	"backup-chaos": {
 		"disk": true, 
 		"internet": false, 
-		"interval": 1,
+		"interval": 0.7,
 		"local": false
 	}, 
 	"backup-status": {
