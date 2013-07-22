@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.5.5
+    - Let script succeed
+
 v1.5.4
     - Run ``backup-chaos`` more often
 
