@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.5.6
+    - Push repos to bitbucket
+
 v1.5.5
     - Let script succeed
 
