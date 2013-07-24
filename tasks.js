@@ -137,6 +137,12 @@
 		"interval": 1,
 		"local": true
 	}, 
+	"rebuild-website": {
+		"disk": false, 
+		"internet": true, 
+		"interval": 14,
+		"local": false
+	}, 
 	"thumbnails": {
 		"disk": true, 
 		"internet": false, 
