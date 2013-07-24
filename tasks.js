@@ -8,7 +8,7 @@
 	"backup-status": {
 		"disk": false, 
 		"internet": true, 
-		"interval": 1,
+		"interval": 0.5,
 		"local": false
 	}, 
 	"backup-webservers": {
@@ -38,13 +38,13 @@
 	"flash-cookies": {
 		"disk": false, 
 		"internet": false, 
-		"interval": 0.5,
+		"interval": 0.3,
 		"local": true
 	}, 
 	"git-autopush": {
 		"disk": true, 
 		"internet": true, 
-		"interval": 0.2,
+		"interval": 0.3,
 		"local": false
 	}, 
 	"git-gc": {
@@ -98,7 +98,7 @@
 	"notes-download": {
 		"disk": false, 
 		"internet": true, 
-		"interval": 1,
+		"interval": 0.5,
 		"local": false
 	}, 
 	"octave-core-cleanup": {
@@ -128,7 +128,7 @@
 	"ppa": {
 		"disk": true, 
 		"internet": true, 
-		"interval": 3,
+		"interval": 1,
 		"local": true
 	}, 
 	"qkey": {
