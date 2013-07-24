@@ -4,6 +4,10 @@
 Changelog
 #########
 
+v1.6
+    - *Added*: Rebuild my personal website
+    - Change the interval of tasks
+
 v1.5.6
     - Push repos to bitbucket
 
