@@ -176,8 +176,8 @@ def main():
         if options.local and not attributes["local"]:
             needs = False
 
-        if command in options.tasks:
-            needs = True
+        if len(options.tasks) > 0:
+            needs = command in options.tasks
 
         if not needs:
             continue
