@@ -77,7 +77,6 @@ class Task(threading.Thread):
                 output.append(e)
             except OSError as e:
                 output.append(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
-                pass
             else:
                 if save_data_lock.acquire():
                     if not task in self.data:
