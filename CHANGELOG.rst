@@ -45,14 +45,16 @@ v1.4.3
     - *git-autopush*: Dirty → Push
 
 v1.4.2
-    - *git-autopush*: Create git repos on remotes automatically, if they are missing
+    - *git-autopush*: Create git repos on remotes automatically, if they are
+      missing
     - Run git-autopush more often
 
 v1.4.1
     - Copy podcasts to devices
 
 v1.4
-    - *git-autopush*: Show which git repos needs to be created on the remote servers.
+    - *git-autopush*: Show which git repos needs to be created on the remote
+      servers.
 
 v1.3.4
     - Run PPA script more often
