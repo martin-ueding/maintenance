@@ -4,9 +4,11 @@
 Changelog
 #########
 
+    - *git-autopush*: Fix spacing
+
 v1.7
+    - *rebuild-website*: Log the output
     - Show output of the one disk heavy task
-    - Log the output of ``rebuild-website``
     - Add override to run selected tasks
 
 v1.6
@@ -14,7 +16,7 @@ v1.6
     - Change the interval of tasks
 
 v1.5.6
-    - Push repos to bitbucket
+    - *git-autopush*: Push repos to bitbucket
 
 v1.5.5
     - Let script succeed
@@ -29,39 +31,39 @@ v1.5.2
     - Fix JSON notation
 
 v1.5.1
+    - **Added**: Remove flash cookies
     - Make output of blank lines consistent
-    - *Added*: Remove flash cookies
 
 v1.5
-    - Clean up ``.DS_Store``
-    - Improve package handling
+    - **Added**: Clean up ``.DS_Store``
+    - *ppa*: Improve package handling
 
 v1.4.4
-    - Let ``git-autopush`` write to ``backup-status``
+    - *git-autopush*: Let ``git-autopush`` write to ``backup-status``
 
 v1.4.3
-    - Dirty → Push
+    - *git-autopush*: Dirty → Push
 
 v1.4.2
-    - Create git repos on remotes automatically, if they are missing
+    - *git-autopush*: Create git repos on remotes automatically, if they are missing
     - Run git-autopush more often
 
 v1.4.1
     - Copy podcasts to devices
 
 v1.4
-    - Show which git repos needs to be created on the remote servers.
+    - *git-autopush*: Show which git repos needs to be created on the remote servers.
 
 v1.3.4
     - Run PPA script more often
 
 v1.3.3
-    - *Added*: peer-review
+    - **Added**: peer-review
     - Print whole command
 
 v1.3.2
+    - *ppa*: Perform upgrades as well
     - Print waiting tasks as well
-    - Perform upgrades as well
 
 v1.3.1
     - New tasks
@@ -76,8 +78,8 @@ v1.2
     - GPLv2+ license
 
 v1.1.1
-    - New tasks
-    - Publish more packages
+    - **Added**: New tasks
+    - *ppa*: Publish more packages
 
 v1.1
     - Multiple processes in parallel
@@ -93,10 +95,10 @@ v1.0
     - Use ``tasks.js`` to organize tasks
 
 v0.9.2
-    - More packages uploaded
+    - *ppa*: More packages uploaded
 
 v0.9.1
-    - Upload maintenance scripts to PPA as well
+    - *ppa*: Upload maintenance scripts as well
 
 v0.9
     Initial version
