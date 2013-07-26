@@ -176,6 +176,9 @@ def main():
         if options.local and not attributes["local"]:
             needs = False
 
+        if command in options.tasks:
+            needs = True
+
         if not needs:
             continue
 
@@ -252,6 +255,7 @@ def _parse_args():
     :rtype: Namespace
     """
     parser = argparse.ArgumentParser(description="Runs periodic tasks and logs that they are done.")
+    parser.add_argument("tasks", metavar="task", type=str, nargs="*", help="Task to run.")
     parser.add_argument("-n", action="store_true", dest="dry", default=False, help="Dry run, only show what would be done.")
     parser.add_argument("-f", action="store_true", help="Run even without power and internet connection.")
     parser.add_argument("--local", action="store_true", help="Run only local tasks.")
