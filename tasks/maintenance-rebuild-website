@@ -31,4 +31,9 @@ make clean
 echo $"I: Building …"
 make
 echo $"I: Deploying …"
-./deploy
+if ! ./deploy &> ~/TODO/deploy.log
+then
+	echo $"E: Something went wrong."
+fi
+
+exit 0
