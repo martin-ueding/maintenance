@@ -101,7 +101,8 @@ check-folder() {
 	do
 		if ! containsElement "$remote" "${has_remotes[@]}"
 		then
-			echo -e "${red}INIT${reset}\t$remote\t$foldername"
+			echo -en "${red}INIT${reset}"
+			printf "%12s %s\n" "$remote" "$foldername"
 			git "push-$remote" "$reponame"
 		fi
 	done
@@ -112,13 +113,15 @@ check-folder() {
 		lines="$(git log --oneline "$remote/master..master" | wc -l)"
 		if (( lines > 0 ))
 		then
-			echo -e "${orange}PUSH${reset}\t$remote\t$foldername"
+			echo -en "${orange}PUSH${reset}"
+			printf "%12s %s\n" "$remote" "$foldername"
 			if ! git push "$remote" --mirror
 			then
 				echo -e "${red}Push failed.$reset"
 			fi
 		else
-			echo -e "${green}OK${reset}\t$remote\t$foldername"
+			echo -en "${green}OK${reset}"
+			printf "\t%-12s %s\n" "$remote" "$foldername"
 		fi
 	done
 }
