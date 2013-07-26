@@ -69,23 +69,48 @@ class Task(threading.Thread):
             output.append("Aborting this task. You can use “-f” to run it anyway.")
 
         if run and not self.options.dry:
-            try:
-                syscommand = 'maintenance-{}'.format(self.command)
-                output.append(subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode())
-            except subprocess.CalledProcessError as e:
-                output.append(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
-                output.append(e)
-            except OSError as e:
-                output.append(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
-            else:
-                if save_data_lock.acquire():
-                    if not task in self.data:
-                        self.data[task] = {}
-                    self.data[task]["last"] = str(datetime.datetime.now())
-                    save_data(self.data)
-                    save_data_lock.release()
+            syscommand = 'maintenance-{}'.format(self.command)
+            # If this is a disk heavy task, show the output right away.
+            if self.attributes['disk']:
+                print_block(output)
+                output = []
+                try:
+                    if print_lock.acquire():
+                        subprocess.check_call([syscommand])
+                except subprocess.CalledProcessError as e:
+                    print_lock.release()
+                    output.append(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+                    output.append(e)
+                except OSError as e:
+                    print_lock.release()
+                    output.append(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
                 else:
-                    print_block(["Error locking!"])
+                    print_lock.release()
+                    if save_data_lock.acquire():
+                        if not task in self.data:
+                            self.data[task] = {}
+                        self.data[task]["last"] = str(datetime.datetime.now())
+                        save_data(self.data)
+                        save_data_lock.release()
+                    else:
+                        print_block(["Error locking!"])
+            else:
+                try:
+                    output.append(subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode())
+                except subprocess.CalledProcessError as e:
+                    output.append(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+                    output.append(e)
+                except OSError as e:
+                    output.append(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
+                else:
+                    if save_data_lock.acquire():
+                        if not task in self.data:
+                            self.data[task] = {}
+                        self.data[task]["last"] = str(datetime.datetime.now())
+                        save_data(self.data)
+                        save_data_lock.release()
+                    else:
+                        print_block(["Error locking!"])
 
         print_block(output)
 
