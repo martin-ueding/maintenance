@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.7
+    - Show output of the one disk heavy task
+    - Log the output of ``rebuild-website``
+    - Add override to run selected tasks
+
 v1.6
     - *Added*: Rebuild my personal website
     - Change the interval of tasks
