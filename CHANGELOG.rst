@@ -4,6 +4,7 @@
 Changelog
 #########
 
+v1.7.1
     - *git-autopush*: Fix spacing
 
 v1.7
