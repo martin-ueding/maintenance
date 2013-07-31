@@ -110,11 +110,12 @@ class Package(object):
         '''
         latest_folder = self.get_latest_folder()
 
-        if source:
-            self.bump_release()
         os.chdir(os.path.join(basedir, self.name, latest_folder, 'debian'))
         sed_command = ['sed', '-i', 's/UNRELEASED/{}/'.format(current_release), 'changelog']
         subprocess.check_call(sed_command)
+
+        if source:
+            self.bump_release()
 
         os.chdir(os.path.join(basedir, self.name, self.get_latest_folder()))
 
