@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.7.2
+    - *maintenance*: Improve output by forcing the output of one thread into
+      one block.
+    - *git-autopush*: Fix spacing in all cases
+
 v1.7.1
     - *git-autopush*: Fix spacing
 
