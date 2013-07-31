@@ -261,7 +261,10 @@ class Package(object):
         return latest_folder != prefix
 
     def needs_new_series(self):
-        return self.get_release() != current_release
+        release = self.get_release()
+        return_value = release != current_release
+        print("Found and current:", release, current_release, return_value)
+        return return_value
 
     def needs_upgrade(self):
         '''
