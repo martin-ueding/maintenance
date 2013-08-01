@@ -1,0 +1,18 @@
+#!/bin/bash
+# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+
+set -e
+set -u
+
+shopt -s extglob
+
+find "$HOME/"!(Bilder|Backup) -type d -name .git | sort | while read -r git_dir
+do
+	(
+	cd "$git_dir"
+	cd ..
+	echo "Generating ctags for $(pwd)"
+	ctags -R .
+	echo
+	)
+done
