@@ -29,6 +29,12 @@
 		"interval": 7,
 		"local": false
 	}, 
+	"ctags": {
+		"disk": true, 
+		"internet": false, 
+		"interval": 3,
+		"local": false
+	}, 
 	"dsstore": {
 		"disk": true, 
 		"internet": false, 
