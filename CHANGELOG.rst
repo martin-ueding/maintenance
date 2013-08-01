@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.3
+    - **Added**: Generate ``tags`` file with ``ctags``
+
 v1.7.2
     - *git-autopush*: Fix spacing in all cases
     - *maintenance*: Improve output by forcing the output of one thread into
