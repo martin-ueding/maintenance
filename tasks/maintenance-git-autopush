@@ -103,7 +103,7 @@ check-folder() {
 		then
 			printf "%s%-8s%s" "${red}" "INIT" "${reset}"
 			printf "%-12s %s\n" "$remote" "$foldername"
-			git "push-$remote" "$reponame"
+			git "init-$remote" "$reponame"
 		fi
 	done
 
