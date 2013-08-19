@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.5
+    - *rebuild-website*: Remove since it is buggy
+
 v1.7.4
     - *git-autopush*: Reflect name change in ``git-push-*``.
 
