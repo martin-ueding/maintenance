@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.6
+    - *git-autopush*: Fetch foreign remotes
+
 v1.7.5
     - *rebuild-website*: Remove since it is buggy
 
