@@ -101,6 +101,19 @@ check-folder() {
 		fi
 	done
 
+	for remote in $(git remote)
+	do
+		if ! containsElement "$remote" "${remotes[@]}"
+		then
+			printf "%s%-8s%s" "${cyan}" "FETCH" "${reset}"
+			printf "%-12s %s\n" "$remote" "$foldername"
+			if ! git fetch "$remote"
+			then
+				echo -e "${red}Fetch failed.$reset"
+			fi
+		fi
+	done
+
 	for remote in "${remotes[@]}"
 	do
 		if ! containsElement "$remote" "${has_remotes[@]}"
@@ -126,19 +139,6 @@ check-folder() {
 		else
 			printf "%s%-8s%s" "${green}" "OK" "${reset}"
 			printf "%-12s %s\n" "$remote" "$foldername"
-		fi
-	done
-
-	for remote in $(git remote)
-	do
-		if ! containsElement "$remote" "${remotes[@]}"
-		then
-			printf "%s%-8s%s" "${cyan}" "FETCH" "${reset}"
-			printf "%-12s %s\n" "$remote" "$foldername"
-			if ! git fetch "$remote"
-			then
-				echo -e "${red}Fetch failed.$reset"
-			fi
 		fi
 	done
 }
