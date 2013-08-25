@@ -4,6 +4,10 @@
 Changelog
 #########
 
+v1.7.7
+    - *ctags*: Prevent script from failing
+    - *git-autopush*: Fetch first
+
 v1.7.6
     - *git-autopush*: Fetch foreign remotes
 
