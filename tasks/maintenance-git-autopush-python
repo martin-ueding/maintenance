@@ -38,7 +38,7 @@ def find_remotes(repo):
     return remotes
 
 def handle_repo(repo):
-    print(c.cyan+"Finding remotes for {} …".format(os.path.basename(repo))+c.reset)
+    print(c.cyan+"Finding remotes for {:25s} …".format(os.path.basename(repo))+c.reset, end='\t')
     remotes = find_remotes(repo)
     print(c.cyan+"Done. Found {} remotes.".format(len(remotes))+c.reset)
 
@@ -46,13 +46,23 @@ def handle_repo(repo):
     if len(remotes) == 0:
         return
 
+    remote_name = find_remote_name(repo, remotes)
+
+def find_remote_name(repo, remotes):
+    reponame = None
+
     for remote in remotes:
-        print ("Remote:", remote)
         output = subprocess.check_output(["git", "config", "--get", "remote.{}.url".format(remote)]).decode().strip()
-        print("Output:", output)
         match = re.search(r"([^/.]+)(\.git)?$", output)
         if match:
-            print("Match:", match.group(1))
+            reponame = match.group(1)
+            break
+
+    if reponame is None:
+        reponame = os.path.basename(repo)
+        print(c.red+"Could not determine remote name for {}!.".format(os.path.basename(repo))+c.reset)
+
+    return reponame
 
 def main():
     options = _parse_args()
