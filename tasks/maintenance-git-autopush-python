@@ -15,8 +15,14 @@ c = colorcodes.Colorcodes()
 
 mirrors = ["chaos", "bitbucket", "github"]
 
+status = {
+    "ok": 0,
+    "init": 0,
+    "push": 0,
+}
+
 def find_repos():
-    start_folders = ["Branches", "Dokumente/Studium"]
+    start_folders = ["Branches", "Dokumente/Studium", ".vim"]
 
     repos = []
 
@@ -51,7 +57,7 @@ def fetch(repo, remotes):
         if remote in mirrors:
             continue
 
-        print(c.blue + "{:8} {:12} {}".format("FETCH", remote, os.path.basename(repo)) + c.reset)
+        print(c.blue + "{:8} {:12} {}".format("FETCH", remote, repo) + c.reset)
         subprocess.call(["git", "fetch", remote, "--prune"])
 
 def init(repo, remotes):
@@ -70,21 +76,30 @@ def init(repo, remotes):
         if mirror in remotes:
             continue
 
-        print(c.red + "{:8} {:12} {}".format("INIT", remote, os.path.basename(repo)) + c.reset)
-        subprocess.call(["git", "init-{}".format(remote), remote_name])
+        print(c.red + "{:8} {:12} {}".format("INIT", mirror, repo) + c.reset)
+        global status
+        status["init"] += 1
+        subprocess.call(["git", "init-{}".format(mirror), remote_name])
 
 def push(repo, remotes):
+    global status
     for remote in remotes:
         if not remote in mirrors:
             continue
 
-        output = subprocess.check_output(["git", "log", "--oneline", "{}/master..master".format(remote)]).decode().strip()
-        lines = [x for x in output.split("\n") if len(x) > 0]
-        if len(lines) == 0:
-            print(c.green + "{:8} {:12} {}".format("OK", remote, os.path.basename(repo)) + c.reset)
+        try:
+            output = subprocess.check_output(["git", "log", "--oneline", "{}/master..master".format(remote)]).decode().strip()
+        except subprocess.CalledProcessError as e:
+            init(repo, remotes)
         else:
-            print(c.orange + "{:8} {:12} {}".format("PUSH", remote, os.path.basename(repo)) + c.reset)
-            subprocess.call(["git", "push", remote, "--mirror"])
+            lines = [x for x in output.split("\n") if len(x) > 0]
+            if len(lines) == 0:
+                status["ok"] += 1
+                print(c.green + "{:8} {:12} {}".format("OK", remote, repo) + c.reset)
+            else:
+                status["push"] += 1
+                print(c.orange + "{:8} {:12} {}".format("PUSH", remote, repo) + c.reset)
+                subprocess.call(["git", "push", remote, "--mirror"])
 
 def find_remote_name(repo, remotes):
     reponame = None
@@ -102,6 +117,13 @@ def find_remote_name(repo, remotes):
 
     return reponame
 
+def print_stats():
+    print()
+
+    global status
+    for status, number in sorted(status.items()):
+        print(c.cyan + "{:8} {:4d}".format(status, number) + c.reset)
+
 def main():
     options = _parse_args()
 
@@ -115,6 +137,8 @@ def main():
 
     for repo in repos:
         handle_repo(repo)
+
+    print_stats()
 
 def _parse_args():
     """
