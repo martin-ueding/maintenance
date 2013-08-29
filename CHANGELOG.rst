@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.8
+    - *git-autopush*: Rewrite in Python 3
+
 v1.7.7
     - *ctags*: Prevent script from failing
     - *git-autopush*: Fetch first
