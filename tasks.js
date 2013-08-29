@@ -35,6 +35,12 @@
 		"interval": 3,
 		"local": false
 	}, 
+	"download-mysql-backup": {
+		"disk": false, 
+		"internet": true, 
+		"interval": 1,
+		"local": false
+	}, 
 	"dsstore": {
 		"disk": true, 
 		"internet": false, 
