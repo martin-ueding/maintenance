@@ -48,6 +48,16 @@ def handle_repo(repo):
 
     remote_name = find_remote_name(repo, remotes)
 
+    fetch(repo, remotes)
+
+def fetch(repo, remotes):
+    for remote in remotes:
+        if remote in mirrors:
+            continue
+
+        print(c.blue + "{:8} {:12} {}".format("FETCH", remote, os.path.basename(repo)) + c.reset)
+        subprocess.call(["git", "fetch", remote, "--prune"])
+
 def find_remote_name(repo, remotes):
     reponame = None
 
