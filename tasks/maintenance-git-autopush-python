@@ -16,15 +16,15 @@ c = colorcodes.Colorcodes()
 mirrors = ["chaos", "bitbucket", "github"]
 
 def find_repos():
-    start_folders = ["Branches"]
+    start_folders = ["Branches", "Dokumente/Studium"]
 
     repos = []
 
     for start in start_folders:
         for dirpath, dirnames, filenames in os.walk(os.path.expanduser(os.path.join("~", start))):
-            if dirpath.endswith("/.git"):
+            if ".git" in dirnames:
                 dirnames = []
-                repos.append(os.path.dirname(dirpath))
+                repos.append(os.path.join(dirpath))
                 print(repos[-1])
 
     return repos
