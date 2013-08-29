@@ -1,0 +1,59 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+
+import argparse
+import colorcodes
+import os
+
+__docformat__ = "restructuredtext en"
+
+c = colorcodes.Colorcodes()
+
+mirrors = ["chaos", "bitbucket", "github"]
+
+
+def find_repos():
+    start_folders = ["Branches"]
+
+    repos = []
+
+    for start in start_folders:
+        for dirpath, dirnames, filenames in os.walk(os.path.expanduser(os.path.join("~", start))):
+            if dirpath.endswith("/.git"):
+                dirnames = []
+                repos.append(dirpath)
+                print(dirpath)
+
+
+    return repos
+
+
+def main():
+    options = _parse_args()
+
+    print(c.purple+"Welcome to git-autopush, the next generation."+c.reset)
+
+    print(c.cyan+"Populating list of git repositories …"+c.reset)
+    repos = find_repos()
+    print(c.cyan+"Done. Found {} git repositories.".format(len(repos))+c.reset)
+
+
+def _parse_args():
+    """
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    """
+    parser = argparse.ArgumentParser(description="")
+    #parser.add_argument("args", metavar="N", type=str, nargs="*", help="Positional arguments.")
+    #parser.add_argument("", dest="", type="", default=, help=)
+    #parser.add_argument("--version", action="version", version="<the version>")
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    main()
