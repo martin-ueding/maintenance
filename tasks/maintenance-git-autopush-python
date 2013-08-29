@@ -15,7 +15,6 @@ c = colorcodes.Colorcodes()
 
 mirrors = ["chaos", "bitbucket", "github"]
 
-
 def find_repos():
     start_folders = ["Branches"]
 
@@ -27,7 +26,6 @@ def find_repos():
                 dirnames = []
                 repos.append(os.path.dirname(dirpath))
                 print(repos[-1])
-
 
     return repos
 
@@ -131,7 +129,6 @@ def _parse_args():
     #parser.add_argument("--version", action="version", version="<the version>")
 
     return parser.parse_args()
-
 
 if __name__ == "__main__":
     main()
