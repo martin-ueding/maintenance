@@ -38,17 +38,15 @@ def find_remotes(repo):
     return remotes
 
 def handle_repo(repo):
-    print(c.cyan+"Finding remotes for {:25s} …".format(os.path.basename(repo))+c.reset, end='\t')
     remotes = find_remotes(repo)
-    print(c.cyan+"Done. Found {} remotes.".format(len(remotes))+c.reset)
 
 	# If there are no remotes in this repo, there is nothing more to do.
     if len(remotes) == 0:
         return
 
-    remote_name = find_remote_name(repo, remotes)
-
-    fetch(repo, remotes)
+    #fetch(repo, remotes)
+    init(repo, remotes)
+    push(repo, remotes)
 
 def fetch(repo, remotes):
     for remote in remotes:
@@ -57,6 +55,38 @@ def fetch(repo, remotes):
 
         print(c.blue + "{:8} {:12} {}".format("FETCH", remote, os.path.basename(repo)) + c.reset)
         subprocess.call(["git", "fetch", remote, "--prune"])
+
+def init(repo, remotes):
+    is_public = False
+    for mirror in mirrors:
+        if mirror in remotes:
+            is_public = True
+            break
+
+    if not is_public:
+        return
+
+    remote_name = find_remote_name(repo, remotes)
+
+    for mirror in mirrors:
+        if mirror in remotes:
+            continue
+
+        print(c.red + "{:8} {:12} {}".format("INIT", remote, os.path.basename(repo)) + c.reset)
+        subprocess.call(["git", "init-{}".format(remote), remote_name])
+
+def push(repo, remotes):
+    for remote in remotes:
+        if not remote in mirrors:
+            continue
+
+        output = subprocess.check_output(["git", "log", "--oneline", "{}/master..master".format(remote)]).decode().strip()
+        lines = [x for x in output.split("\n") if len(x) > 0]
+        if len(lines) == 0:
+            print(c.green + "{:8} {:12} {}".format("OK", remote, os.path.basename(repo)) + c.reset)
+        else:
+            print(c.orange + "{:8} {:12} {}".format("PUSH", remote, os.path.basename(repo)) + c.reset)
+            subprocess.call(["git", "push", remote, "--mirror"])
 
 def find_remote_name(repo, remotes):
     reponame = None
