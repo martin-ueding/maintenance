@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.9
+    - **Added**: *download-mysql-backup*
+
 v1.7.8
     - *git-autopush*: Rewrite in Python 3
 
