@@ -4,8 +4,10 @@
 # Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
+import re
 import colorcodes
 import os
+import subprocess
 
 __docformat__ = "restructuredtext en"
 
@@ -23,12 +25,34 @@ def find_repos():
         for dirpath, dirnames, filenames in os.walk(os.path.expanduser(os.path.join("~", start))):
             if dirpath.endswith("/.git"):
                 dirnames = []
-                repos.append(dirpath)
-                print(dirpath)
+                repos.append(os.path.dirname(dirpath))
+                print(repos[-1])
 
 
     return repos
 
+def find_remotes(repo):
+    os.chdir(repo)
+    output = subprocess.check_output(["git", "remote"]).decode().strip()
+    remotes = [x for x in output.split("\n") if len(x) > 0]
+    return remotes
+
+def handle_repo(repo):
+    print(c.cyan+"Finding remotes for {} …".format(os.path.basename(repo))+c.reset)
+    remotes = find_remotes(repo)
+    print(c.cyan+"Done. Found {} remotes.".format(len(remotes))+c.reset)
+
+	# If there are no remotes in this repo, there is nothing more to do.
+    if len(remotes) == 0:
+        return
+
+    for remote in remotes:
+        print ("Remote:", remote)
+        output = subprocess.check_output(["git", "config", "--get", "remote.{}.url".format(remote)]).decode().strip()
+        print("Output:", output)
+        match = re.search(r"([^/.]+)(\.git)?$", output)
+        if match:
+            print("Match:", match.group(1))
 
 def main():
     options = _parse_args()
@@ -39,6 +63,10 @@ def main():
     repos = find_repos()
     print(c.cyan+"Done. Found {} git repositories.".format(len(repos))+c.reset)
 
+    repos.sort()
+
+    for repo in repos:
+        handle_repo(repo)
 
 def _parse_args():
     """
