@@ -1,154 +1,158 @@
-#!/bin/bash
-# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
-# Goes through the ``~/Branches`` folder and checks for the given remotes
-# whether they need to be pushed.
+# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
 
-set -e
+import argparse
+import re
+import colorcodes
+import os
+import subprocess
 
-shopt -s extglob
+__docformat__ = "restructuredtext en"
 
-###############################################################################
-#                                  settings                                   #
-###############################################################################
+c = colorcodes.Colorcodes()
 
-remotes=( github chaos bitbucket )
+mirrors = ["chaos", "bitbucket", "github"]
 
-###############################################################################
-
-# Gather color codes using ``tput``.
-if [[ -x /usr/bin/tput ]] && tput setaf 1 &> /dev/null
-then
-	bold="$(tput bold)"
-
-	blue="$(tput setaf 4)"
-	cyan="$(tput setaf 6)"
-	green="$(tput setaf 2)"
-	orange="$(tput setaf 3)"
-	purple="$(tput setaf 5)"
-	red="$(tput setaf 1)"
-
-	reset="$(tput sgr0)"
-else
-	bold=
-
-	blue=
-	green=
-	cyan=
-	purple=
-	orange=
-	red=
-
-	reset=
-fi
-
-###############################################################################
-
-# http://stackoverflow.com/a/8574392/653152
-containsElement () {
-	local e
-	for e in "${@:2}"
-	do
-		if [[ "$e" == "$1" ]] 
-		then
-			return 0
-		fi
-	done
-	return 1
+status = {
+    "ok": 0,
+    "init": 0,
+    "push": 0,
 }
 
-check-folder() {
-	local project foldername lines has_remotes
+def find_repos():
+    start_folders = ["Branches", "Dokumente/Studium", ".vim"]
 
-	project="$1"
+    repos = []
 
-	cd "$project"
+    for start in start_folders:
+        for dirpath, dirnames, filenames in os.walk(os.path.expanduser(os.path.join("~", start))):
+            if ".git" in dirnames:
+                dirnames = []
+                repos.append(os.path.join(dirpath))
+                print(repos[-1])
 
-	# Skip non git repositories.
-	if [[ ! -d .git ]]
-	then
-		exit 1
-	fi
+    return repos
 
-	foldername="${project#./}"
-	foldername="${foldername%/}"
+def find_remotes(repo):
+    os.chdir(repo)
+    output = subprocess.check_output(["git", "remote"]).decode().strip()
+    remotes = [x for x in output.split("\n") if len(x) > 0]
+    return remotes
 
-	has_remotes=()
-
-	for remote in "${remotes[@]}"
-	do
-		# Check if this is an actual remote.
-		if git remote | grep "$remote" > /dev/null
-		then
-			has_remotes=("${has_remotes[@]}" "$remote")
-		fi
-	done
+def handle_repo(repo):
+    remotes = find_remotes(repo)
 
 	# If there are no remotes in this repo, there is nothing more to do.
-	if (( ${#has_remotes[@]} == 0 ))
-	then
-		return 0
-	fi
+    if len(remotes) == 0:
+        return
 
-	for remote in "${remotes[@]}"
-	do
-		if containsElement "$remote" "${has_remotes[@]}"
-		then
-			remoteurl="$(git config --get "remote.$remote.url")"
-			remoteurl2="${remoteurl##*/}"
-			reponame="${remoteurl2%.git}"
-			break
-		fi
-	done
+    #fetch(repo, remotes)
+    init(repo, remotes)
+    push(repo, remotes)
 
-	for remote in $(git remote)
-	do
-		if ! containsElement "$remote" "${remotes[@]}"
-		then
-			printf "%s%-8s%s" "${cyan}" "FETCH" "${reset}"
-			printf "%-12s %s\n" "$remote" "$foldername"
-			if ! git fetch "$remote"
-			then
-				echo -e "${red}Fetch failed.$reset"
-			fi
-		fi
-	done
+def fetch(repo, remotes):
+    for remote in remotes:
+        if remote in mirrors:
+            continue
 
-	for remote in "${remotes[@]}"
-	do
-		if ! containsElement "$remote" "${has_remotes[@]}"
-		then
-			printf "%s%-8s%s" "${red}" "INIT" "${reset}"
-			printf "%-12s %s\n" "$remote" "$foldername"
-			git "init-$remote" "$reponame"
-		fi
-	done
+        print(c.blue + "{:8} {:12} {}".format("FETCH", remote, repo) + c.reset)
+        subprocess.call(["git", "fetch", remote, "--prune"])
 
-	for remote in "${has_remotes[@]}"
-	do
-		# Check whether this remote needs to be pushed.
-		lines="$(git log --oneline "$remote/master..master" | wc -l)"
-		if (( lines > 0 ))
-		then
-			printf "%s%-8s%s" "${orange}" "PUSH" "${reset}"
-			printf "%-12s %s\n" "$remote" "$foldername"
-			if ! git push "$remote" --mirror
-			then
-				echo -e "${red}Push failed.$reset"
-			fi
-		else
-			printf "%s%-8s%s" "${green}" "OK" "${reset}"
-			printf "%-12s %s\n" "$remote" "$foldername"
-		fi
-	done
-}
+def init(repo, remotes):
+    is_public = False
+    for mirror in mirrors:
+        if mirror in remotes:
+            is_public = True
+            break
 
-find "$HOME/"!(Bilder|Backup) -type d -name .git | sort | while read -r git_dir
-do
-	check-folder "${git_dir%/.git}"
-done
+    if not is_public:
+        return
 
-if type backup-status &> /dev/null
-then
-	backup-status update 'GitHub & Chaos' to
-fi
+    remote_name = find_remote_name(repo, remotes)
+
+    for mirror in mirrors:
+        if mirror in remotes:
+            continue
+
+        print(c.red + "{:8} {:12} {}".format("INIT", mirror, repo) + c.reset)
+        global status
+        status["init"] += 1
+        subprocess.call(["git", "init-{}".format(mirror), remote_name])
+
+def push(repo, remotes):
+    global status
+    for remote in remotes:
+        if not remote in mirrors:
+            continue
+
+        try:
+            output = subprocess.check_output(["git", "log", "--oneline", "{}/master..master".format(remote)]).decode().strip()
+        except subprocess.CalledProcessError as e:
+            init(repo, remotes)
+        else:
+            lines = [x for x in output.split("\n") if len(x) > 0]
+            if len(lines) == 0:
+                status["ok"] += 1
+                print(c.green + "{:8} {:12} {}".format("OK", remote, repo) + c.reset)
+            else:
+                status["push"] += 1
+                print(c.orange + "{:8} {:12} {}".format("PUSH", remote, repo) + c.reset)
+                subprocess.call(["git", "push", remote, "--mirror"])
+
+def find_remote_name(repo, remotes):
+    reponame = None
+
+    for remote in remotes:
+        output = subprocess.check_output(["git", "config", "--get", "remote.{}.url".format(remote)]).decode().strip()
+        match = re.search(r"([^/.]+)(\.git)?$", output)
+        if match:
+            reponame = match.group(1)
+            break
+
+    if reponame is None:
+        reponame = os.path.basename(repo)
+        print(c.red+"Could not determine remote name for {}!.".format(os.path.basename(repo))+c.reset)
+
+    return reponame
+
+def print_stats():
+    print()
+
+    global status
+    for status, number in sorted(status.items()):
+        print(c.cyan + "{:8} {:4d}".format(status, number) + c.reset)
+
+def main():
+    options = _parse_args()
+
+    print(c.purple+"Welcome to git-autopush, the next generation."+c.reset)
+
+    print(c.cyan+"Populating list of git repositories …"+c.reset)
+    repos = find_repos()
+    print(c.cyan+"Done. Found {} git repositories.".format(len(repos))+c.reset)
+
+    repos.sort()
+
+    for repo in repos:
+        handle_repo(repo)
+
+    print_stats()
+
+def _parse_args():
+    """
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    """
+    parser = argparse.ArgumentParser(description="")
+    #parser.add_argument("args", metavar="N", type=str, nargs="*", help="Positional arguments.")
+    #parser.add_argument("", dest="", type="", default=, help=)
+    #parser.add_argument("--version", action="version", version="<the version>")
+
+    return parser.parse_args()
+
+if __name__ == "__main__":
+    main()
