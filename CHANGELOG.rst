@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.10
+    - *backup-chaos*: Backup ``Dokumente/Listen``
+
 v1.7.9
     - **Added**: *download-mysql-backup*
 
