@@ -4,9 +4,10 @@
 # Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
-import re
 import colorcodes
+import json
 import os
+import re
 import subprocess
 
 __docformat__ = "restructuredtext en"
@@ -22,16 +23,12 @@ status = {
 }
 
 def find_repos():
-    start_folders = ["Branches", "Dokumente/Studium", ".vim"]
+    outfile = os.path.expanduser("~/.cache/maintenance/git-repos.js")
 
     repos = []
 
-    for start in start_folders:
-        for dirpath, dirnames, filenames in os.walk(os.path.expanduser(os.path.join("~", start))):
-            if ".git" in dirnames:
-                dirnames = []
-                repos.append(os.path.join(dirpath))
-                print(repos[-1])
+    with open(outfile) as f:
+        repos = json.loads(f.read())
 
     return repos
 

@@ -59,6 +59,12 @@
 		"interval": 0.3,
 		"local": false
 	}, 
+	"git-find-repos": {
+		"disk": true, 
+		"internet": false, 
+		"interval": 7,
+		"local": true
+	}, 
 	"git-gc": {
 		"disk": true, 
 		"internet": false, 
