@@ -22,6 +22,9 @@ status = {
     "push": 0,
 }
 
+last_commits = {}
+commits_file = os.path.expanduser("~/.cache/maintenance/last-commits.js")
+
 def find_repos():
     outfile = os.path.expanduser("~/.cache/maintenance/git-repos.js")
 
@@ -31,6 +34,21 @@ def find_repos():
         repos = json.loads(f.read())
 
     return repos
+
+def load_last_commits():
+    global last_commits
+
+    try:
+        with open(commits_file) as f:
+            last_commits = json.loads(f.read())
+    except FileNotFoundError:
+        pass
+
+def save_last_commits():
+    global last_commits
+
+    with open(commits_file, "w") as f:
+        f.write(json.dumps(last_commits, sort_keys=True, indent=4))
 
 def find_remotes(repo):
     os.chdir(repo)
@@ -84,19 +102,35 @@ def push(repo, remotes):
         if not remote in mirrors:
             continue
 
-        try:
-            output = subprocess.check_output(["git", "log", "--oneline", "{}/master..master".format(remote)]).decode().strip()
-        except subprocess.CalledProcessError as e:
-            init(repo, remotes)
+        if not repo in last_commits:
+            last_commits[repo] = {}
+
+        if remote in last_commits[repo]:
+            last_commit = last_commits[repo][remote]
         else:
-            lines = [x for x in output.split("\n") if len(x) > 0]
-            if len(lines) == 0:
+            last_commit = ""
+
+        try:
+            master_commit = subprocess.check_output(["git", "rev-parse", "refs/heads/master"]).decode().strip()
+        except subprocess.CalledProcessError as e:
+            print(e)
+            raise
+        else:
+            print("master:", master_commit, "last", last_commit)
+            if master_commit == last_commit:
                 status["ok"] += 1
                 print(c.green + "{:8} {:12} {}".format("OK", remote, repo) + c.reset)
             else:
                 status["push"] += 1
                 print(c.orange + "{:8} {:12} {}".format("PUSH", remote, repo) + c.reset)
-                subprocess.call(["git", "push", remote, "--mirror"])
+                try:
+                    subprocess.check_call(["git", "push", remote, "--mirror"])
+                except subprocess.CalledProcessError as e:
+                    print(e)
+                else:
+                    last_commits[repo][remote] = master_commit
+                    save_last_commits()
+
 
 def find_remote_name(repo, remotes):
     reponame = None
@@ -123,6 +157,8 @@ def print_stats():
 
 def main():
     options = _parse_args()
+
+    load_last_commits()
 
     print(c.purple+"Welcome to git-autopush, the next generation."+c.reset)
 
