@@ -8,6 +8,7 @@ import colorcodes
 import json
 import os
 import re
+import glob
 import subprocess
 
 __docformat__ = "restructuredtext en"
@@ -43,6 +44,24 @@ def load_last_commits():
             last_commits = json.loads(f.read())
     except FileNotFoundError:
         pass
+
+def migrate_to_mirror(repo, remote):
+    try:
+        is_mirror = (subprocess.check_output(["git", "config", "remote.{}.mirror".format(remote)]).decode().strip() == "true")
+    except subprocess.CalledProcessError:
+        is_mirror = False
+        pass
+
+    if not is_mirror:
+        print("Migrating to mirror:", repo, remote)
+        url = subprocess.check_output(["git", "config", "remote.{}.url".format(remote)]).decode().strip()
+
+        subprocess.check_output(["git", "remote", "rm", remote])
+        subprocess.check_output(["git", "remote", "add", "--mirror=push", remote, url])
+
+    for file_ in glob.glob(".git/refs/remotes/{}/*".format(remote)):
+        print("Deleting mirror ref:", file_)
+        os.unlink(file_)
 
 def save_last_commits():
     global last_commits
@@ -110,13 +129,15 @@ def push(repo, remotes):
         else:
             last_commit = ""
 
+        migrate_to_mirror(repo, remote)
+
         try:
             master_commit = subprocess.check_output(["git", "rev-parse", "refs/heads/master"]).decode().strip()
         except subprocess.CalledProcessError as e:
             print(e)
             raise
         else:
-            print("master:", master_commit, "last", last_commit)
+            #print("master:", master_commit, "last", last_commit)
             if master_commit == last_commit:
                 status["ok"] += 1
                 print(c.green + "{:8} {:12} {}".format("OK", remote, repo) + c.reset)
