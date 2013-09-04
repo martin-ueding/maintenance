@@ -4,7 +4,7 @@
 Changelog
 #########
 
-v.1.7.11
+v1.7.11
     - *git-autopush*: Split up finding of repos into *git-find-repos* script
     - **Added**: *git-find-repos*
     - *git-autopush*: Cache the last published commits in order to remove the
