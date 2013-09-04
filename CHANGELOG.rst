@@ -7,6 +7,8 @@ Changelog
 v.1.7.11
     - *git-autopush*: Split up finding of repos into *git-find-repos* script
     - **Added**: *git-find-repos*
+    - *git-autopush*: Cache the last published commits in order to remove the
+      remote refs in ``git log``.
 
 v1.7.10
     - *backup-chaos*: Backup ``Dokumente/Listen``
