@@ -29,11 +29,10 @@ print_lock = threading.Lock()
 all_threads = []
 
 def print_block(lines):
-    if print_lock.acquire():
+    with print_lock:
         print()
         for line in lines:
             print(line)
-        print_lock.release()
 
 class Task(threading.Thread):
     def __init__(self, command, attributes, options, data):
@@ -63,10 +62,9 @@ class Task(threading.Thread):
         if len(self.output) == 0:
             return
 
-        if print_lock.acquire():
+        with print_lock:
             for line in self.output:
                 print(line)
-            print_lock.release()
 
     def run(self):
         """
