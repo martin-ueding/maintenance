@@ -352,5 +352,17 @@
 		"internet": false, 
 		"interval": 90,
 		"local": false
+	},
+	"xauthority": {
+		"disk": false, 
+		"internet": false, 
+		"interval": 2,
+		"local": true
+	},
+	"xsession-errors": {
+		"disk": false, 
+		"internet": false, 
+		"interval": 2,
+		"local": true
 	}
 }
