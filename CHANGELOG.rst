@@ -4,6 +4,12 @@
 Changelog
 #########
 
+v1.7.12
+    - **Added**: *octave-history* to clean out ``.octave_hist``
+    - **Added**: *xauthority* to clean in ``~``
+    - **Added**: *xsession-errors* to clean in ``~``
+    - Use ``with`` statement in locks
+
 v1.7.11
     - *git-autopush*: Split up finding of repos into *git-find-repos* script
     - **Added**: *git-find-repos*
