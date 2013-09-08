@@ -125,6 +125,12 @@
 		"interval": 90,
 		"local": true
 	}, 
+	"octave-history": {
+		"disk": false, 
+		"internet": false, 
+		"interval": 5,
+		"local": true
+	}, 
 	"okular-docdata": {
 		"disk": true, 
 		"internet": false, 
