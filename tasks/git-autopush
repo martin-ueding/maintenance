@@ -82,7 +82,7 @@ def handle_repo(repo):
     if len(remotes) == 0:
         return
 
-    #fetch(repo, remotes)
+    fetch(repo, remotes)
     init(repo, remotes)
     push(repo, remotes)
 
