@@ -2,16 +2,19 @@
 
 SH := /bin/bash
 
+task_dir := $(DESTDIR)/usr/lib/maintenance/tasks
+
 all:
 
 install:
-	install -d "$(DESTDIR)/usr/bin"; \
+	install -d "$(task_dir)"
 	for task in tasks/*; \
 		do \
-		install -d "$(DESTDIR)/usr/bin"; \
-		install "$$task" -t "$(DESTDIR)/usr/bin"; \
+		install -d "$(task_dir)"; \
+		install "$$task" -t "$(task_dir)"; \
 		done
 #
+	install -d "$(DESTDIR)/usr/bin"
 	install maintenance -t "$(DESTDIR)/usr/bin"
 	install my-clamscan -t "$(DESTDIR)/usr/bin"
 #
