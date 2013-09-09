@@ -4,6 +4,13 @@
 Changelog
 #########
 
+v1.7.13
+    - Move all the task script from ``/usr/bin`` to
+      ``/usr/lib/maintenance/tasks``. That way, Debian Linitan does not
+      complain about missing manual pages. Also, it will motivate the user to
+      run the tasks through the ``maintenance`` program instead of invocing the
+      scripts directly.
+
 v1.7.12
     - **Added**: *octave-history* to clean out ``.octave_hist``
     - **Added**: *xauthority* to clean in ``~``
