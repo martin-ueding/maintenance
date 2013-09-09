@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
 # This script takes a number of tar archive which extract to a single directory,
 # which is the name of the tarball itself (without the ``.tar.gz`` though).
@@ -13,7 +13,7 @@ tmpdir="$(mktemp -d)"
 
 mkdir -p "$tmpdir"
 
-cd "$HOME/Branches"
+cd "$PROJECTS_DIR"
 
 for tarball in *.tar.gz
 do
