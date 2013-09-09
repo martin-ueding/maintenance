@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.7.15
+    - *compress-tarball*: Use environment dirs
+    - *virus-scan-Branches*: Use environment dirs
+    - *virus-scan-Branches*: Use environment dirs
+
 v1.7.14
     - *git-autopush*: Enable fetch again
 
