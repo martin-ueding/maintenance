@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.14
+    - *git-autopush*: Enable fetch again
+
 v1.7.13
     - Move all the task script from ``/usr/bin`` to
       ``/usr/lib/maintenance/tasks``. That way, Debian Linitan does not
