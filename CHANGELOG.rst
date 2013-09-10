@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.16
+    - Replace some scripts with stubs
+
 v1.7.15
     - *compress-tarball*: Use environment dirs
     - *virus-scan-Branches*: Use environment dirs
