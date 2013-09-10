@@ -30,7 +30,7 @@ current_release = platform.dist()[2]
 Ubuntu release that the packages should be on.
 '''
 
-packages = sorted(os.listdir(os.path.expanduser('~/Packaging')))
+packages = sorted(os.listdir(os.path.expanduser('~/Packaging_Debian')))
 
 public = []
 '''
@@ -39,6 +39,13 @@ List of packages that should be uploaded.
 
 upgrades = []
 
+def check_for_debian():
+    dist = platform.dist()
+
+    if not dist[0] in ["Debian", "Ubuntu"]:
+        print(_c.red + "This is not a Debian or Ubuntu machine" + _c.reset)
+        sys.exit(15)
+
 def p(command):
     '''
     Prints the given command.
@@ -46,8 +53,8 @@ def p(command):
     print('$ {}'.format(' '.join(command)))
 
 
-basedir = os.path.expanduser('~/Packaging')
-branchesdir = os.path.expanduser('~/Branches')
+basedir = os.path.expanduser('~/Packaging_Debian')
+branchesdir = os.path.expanduser('~/Projekte')
 
 class PackagingError(Exception):
     '''
@@ -162,7 +169,7 @@ class Package(object):
         for d in [branchesdir, os.path.expanduser('~/.vim/bundle')]:
             try:
                 os.chdir(os.path.join(branchesdir, self.name))
-                subprocess.check_call(['git', 'tarball'])
+                subprocess.check_call(['git', 'tarball', basedir])
             except subprocess.CalledProcessError:
                 pass
             except OSError:
@@ -322,6 +329,8 @@ class Package(object):
 
 def main():
     options = _parse_args()
+
+    check_for_debian()
 
     if options.dry_run:
         subprocess.check_call = p
