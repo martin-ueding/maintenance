@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.17
+    - *backup-chaos*: Update folder names
+
 v1.7.16
     - Replace some scripts with stubs
 
