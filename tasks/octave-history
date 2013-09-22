@@ -6,4 +6,4 @@ set -u
 
 cd "$HOME"
 
-rm -rv .octave_hist
+rm -fv .octave_hist
