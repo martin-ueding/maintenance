@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.18
+    - *octave-history*: Add ``-f`` to ``rm``
+
 v1.7.17
     - *backup-chaos*: Update folder names
 
