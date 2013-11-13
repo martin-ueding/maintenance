@@ -89,6 +89,12 @@
 		"interval": 1,
 		"local": false
 	}, 
+	"lecture-photos": {
+		"disk": true, 
+		"internet": true, 
+		"interval": 2,
+		"local": false
+	}, 
 	"legacy-file-formats": {
 		"disk": true, 
 		"internet": false, 
