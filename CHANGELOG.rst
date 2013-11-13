@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.19
+    - **Added**: *lecture-photos*
+
 v1.7.18
     - *octave-history*: Add ``-f`` to ``rm``
 
