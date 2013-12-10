@@ -4,4 +4,4 @@
 set -e
 set -u
 
-git-gc-all
+git-autogc
