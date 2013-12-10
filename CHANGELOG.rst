@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.7.20
+    - *git-gc*: Update to new program name
+
 v1.7.19
     - **Added**: *lecture-photos*
 
