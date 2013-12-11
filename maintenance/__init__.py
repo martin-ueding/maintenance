@@ -92,7 +92,7 @@ class Task(threading.Thread):
         if pkg_resources.resource_exists(__name__, taskname):
             syscommand = pkg_resources.resource_filename(__name__, taskname)
         else:
-            syscomand = self.command
+            syscommand = self.command
         print(syscommand)
 
         if run and not self.options.dry:
