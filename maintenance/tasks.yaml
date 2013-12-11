@@ -48,12 +48,7 @@ git-autopush:
   internet: true
   interval: 0.3
   local: false
-git-find-repos:
-  disk: true
-  internet: false
-  interval: 7
-  local: true
-git-gc:
+git-autogc:
   disk: true
   internet: false
   interval: 30
