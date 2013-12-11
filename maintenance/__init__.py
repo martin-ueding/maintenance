@@ -15,6 +15,7 @@ import subprocess
 import sys
 import threading
 import time
+import yaml
 
 import colorcodes
 
@@ -165,7 +166,7 @@ def main():
     taskfile = '/etc/maintenance/tasks.js'
     tasks = {}
     with open(taskfile) as f:
-        tasks = json.load(f)
+        tasks = yaml.load(f)
 
     data = {}
     if os.path.isfile(statusfile):
