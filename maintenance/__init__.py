@@ -12,6 +12,7 @@ import os
 import os.path
 import prettytable
 import subprocess
+import pkg_resources
 import sys
 import threading
 import time
@@ -163,10 +164,9 @@ def print_running_tasks(without=None):
 def main():
     options = _parse_args()
 
-    taskfile = '/etc/maintenance/tasks.js'
+    taskfile = pkg_resources.resource_stream(__name__, 'tasks.yaml')
     tasks = {}
-    with open(taskfile) as f:
-        tasks = yaml.load(f)
+    tasks = yaml.load(taskfile)
 
     data = {}
     if os.path.isfile(statusfile):
