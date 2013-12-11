@@ -164,9 +164,9 @@ def print_running_tasks(without=None):
 def main():
     options = _parse_args()
 
-    taskfile = pkg_resources.resource_stream(__name__, 'tasks.yaml')
+    taskfile = 'tasks.yaml'
     tasks = {}
-    tasks = yaml.load(taskfile)
+    tasks = yaml.load(pkg_resources.resource_stream(__name__, taskfile))
 
     data = {}
     if os.path.isfile(statusfile):
