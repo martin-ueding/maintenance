@@ -14,4 +14,7 @@ setup(
             'maintenance = maintenance:main',
         ],
     },
+    scripts=[
+        'my-clamscan',
+    ],
 )
