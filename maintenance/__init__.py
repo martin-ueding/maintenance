@@ -93,7 +93,6 @@ class Task(threading.Thread):
             syscommand = pkg_resources.resource_filename(__name__, taskname)
         else:
             syscommand = self.command
-        print(syscommand)
 
         if run and not self.options.dry:
             # If this is a disk heavy task, show the output right away.
