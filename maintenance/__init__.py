@@ -88,9 +88,11 @@ class Task(threading.Thread):
             run = False
             self.print("Aborting this task. You can use “-f” to run it anyway.")
 
+
         if run and not self.options.dry:
-            syscommand = os.path.join("/usr/lib/maintenance/tasks",
-                                      self.command)
+            syscommand = pkg_resources.resource_filename(
+                __name__, os.path.join('tasks', self.command)
+            )
             # If this is a disk heavy task, show the output right away.
             try:
                 if self.attributes['disk']:
