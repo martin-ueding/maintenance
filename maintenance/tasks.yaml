@@ -8,11 +8,6 @@ backup-status:
   internet: true
   interval: 0.5
   local: false
-backup-webservers:
-  disk: false
-  internet: true
-  interval: 7
-  local: false
 compress-tarball:
   disk: true
   internet: false
