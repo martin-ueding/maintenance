@@ -8,12 +8,12 @@ install:
 .PHONY: clean
 clean:
 	$(RM) *.class *.jar
-	$(RM) *.egg-info
 	$(RM) *.o *.out
 	$(RM) *.orig
 	$(RM) *.pyc *.pyo
+	$(RM) -r *.egg-info
 	$(RM) -r _build
 	$(RM) -r build
+	$(RM) -r build
 	$(RM) -r dist
-	$(RM) build
-	$(RM) dist
+	$(RM) -r dist
