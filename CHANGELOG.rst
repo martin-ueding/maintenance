@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.8.1
+    - Fix makefile
+
 v1.8
     - Use setuptools
 
