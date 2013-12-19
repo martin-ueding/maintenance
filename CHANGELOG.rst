@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.8
+    - Use setuptools
+
 v1.7.20
     - *git-gc*: Update to new program name
 
