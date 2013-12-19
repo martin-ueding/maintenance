@@ -18,5 +18,7 @@ Installation
 Depenencies
 ===========
 
-- Bash
-- Python 3
+- bash
+- python3
+- python3-setuptools
+- python3-yaml
