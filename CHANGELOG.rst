@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.8.2
+    - Actually install the static files
+
 v1.8.1
     - Fix makefile
 
