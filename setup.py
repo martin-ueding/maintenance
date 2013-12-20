@@ -17,4 +17,7 @@ setup(
     scripts=[
         'my-clamscan',
     ],
+    package_data={
+        'maintenance': ['*.yaml', 'tasks/*'],
+    },
 )
