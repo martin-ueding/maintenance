@@ -59,8 +59,8 @@ def task(command, attributes, options, data):
 
     return '\n'.join([str(x) for x in output_list])
 
-def orgoutput(line):
-    termcolor.cprint(line, 'white', attrs=['bold'])
+def orgoutput(*words):
+    termcolor.cprint(' '.join(words), 'white', attrs=['bold'])
 
 def main():
     options = _parse_args()
