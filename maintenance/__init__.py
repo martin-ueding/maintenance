@@ -17,12 +17,10 @@ import subprocess
 import sys
 import time
 import yaml
+import termcolor
 
-import colorcodes
 
 __docformat__ = "restructuredtext en"
-
-_c = colorcodes.Colorcodes()
 
 statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 
@@ -43,7 +41,6 @@ def task(command, attributes, options, data):
     else:
         syscommand = command
 
-
     if run and not options.dry:
         try:
             if attributes['disk']:
@@ -51,16 +48,19 @@ def task(command, attributes, options, data):
             else:
                 output_list.append(subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode())
         except subprocess.CalledProcessError as e:
-            output_list.append(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+            output_list.append(termcolor.colored("Error in {command}:".format(command=syscommand), 'red'))
             output_list.append(e)
         except OSError as e:
-            output_list.append(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
+            output_list.append(termcolor.colored("Could not execute {command}.".format(command=syscommand), 'red'))
         else:
             if not task in data:
                 data[task] = {}
             data[task]["last"] = str(datetime.datetime.now())
 
     return '\n'.join([str(x) for x in output_list])
+
+def orgoutput(line):
+    termcolor.cprint(line, 'white', attrs=['bold'])
 
 def main():
     options = _parse_args()
@@ -98,11 +98,11 @@ def main():
         else:
             calls_nodisk.append([command, attributes, options, data])
 
-    print("Tasks that are done this session:")
+    orgoutput("Tasks that are done this session:")
     print()
     tasks = sorted([call[0] for call in calls_disk + calls_nodisk])
     for line in ["- {}".format(task) for task in tasks]:
-        print(line)
+        orgoutput(line)
 
     futures = []
 
@@ -111,7 +111,7 @@ def main():
             print()
 
         for args in calls_nodisk:
-            print('Scheduling', args[0])
+            orgoutput('Scheduling', args[0])
             futures.append([args[0], executor.submit(task, *args)])
 
         if len(calls_disk) > 0:
@@ -119,7 +119,7 @@ def main():
 
         # Start one thread that uses the disk and wait for that.
         for args in calls_disk:
-            print('Running', args[0])
+            orgoutput('Running', args[0])
             task(*args)
             save_data(data)
 
@@ -127,7 +127,7 @@ def main():
             print()
 
         for command, future in futures:
-            print('Result for', command)
+            orgoutput('Result for', command)
             print(future.result())
             print()
 
