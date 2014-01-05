@@ -1,8 +1,12 @@
-.. Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+.. Copyright © 2013-2014 Martin Ueding <dev@martin-ueding.de>
 
 #########
 Changelog
 #########
+
+v1.9
+    - Use futures instead of manual multithreading
+    - *virus-scan-Packaging*: Fix virus scan of packaging material
 
 v1.8.2
     - Actually install the static files
