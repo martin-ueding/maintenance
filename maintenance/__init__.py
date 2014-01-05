@@ -119,22 +119,16 @@ def main():
             orgoutput('Scheduling', args[0])
             futures.append([args[0], executor.submit(task, *args)])
 
-        if len(calls_disk) > 0:
-            print()
-
-        # Start one thread that uses the disk and wait for that.
         for args in calls_disk:
+            print()
             orgoutput('Running', args[0])
             task(*args)
             save_data(data)
 
-        if len(futures) > 0:
-            print()
-
         for command, future in futures:
+            print()
             orgoutput('Result for', command)
             print(future.result())
-            print()
 
         save_data(data)
 
