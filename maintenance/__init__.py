@@ -4,7 +4,7 @@
 # Copyright © 2012-2014 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
-import concurrent
+import concurrent.futures
 import datetime
 import dateutil.parser
 import glob
@@ -27,40 +27,40 @@ _c = colorcodes.Colorcodes()
 statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 
 def task(command, attributes, options, data):
-    task = os.path.basename(self.command)
+    task = os.path.basename(command)
     run = True
 
     internet, power = pre_check()
 
-    if (self.attributes['internet'] and not internet) or self.options.f:
+    if (attributes['internet'] and not internet) or options.f:
         run = False
-        self.print("Aborting this task. You can use “-f” to run it anyway.")
+        print("Aborting this task. You can use “-f” to run it anyway.")
 
-    taskname = os.path.join('tasks', self.command)
+    taskname = os.path.join('tasks', command)
     if pkg_resources.resource_exists(__name__, taskname):
         syscommand = pkg_resources.resource_filename(__name__, taskname)
     else:
-        syscommand = self.command
+        syscommand = command
 
-    if run and not self.options.dry:
+    if run and not options.dry:
         try:
-            if self.attributes['disk']:
+            if attributes['disk']:
                 subprocess.check_call([syscommand], stderr=subprocess.STDOUT)
             else:
                 output = subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode()
         except subprocess.CalledProcessError as e:
-            self.print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
-            self.print(e)
-            if self.attributes['disk']:
+            print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+            print(e)
+            if attributes['disk']:
                 print_lock.release()
         except OSError as e:
-            self.print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
-            if self.attributes['disk']:
+            print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
+            if attributes['disk']:
                 print_lock.release()
         else:
-            if not task in self.data:
-                self.data[task] = {}
-            self.data[task]["last"] = str(datetime.datetime.now())
+            if not task in data:
+                data[task] = {}
+            data[task]["last"] = str(datetime.datetime.now())
 
     return output
 
@@ -111,15 +111,21 @@ def main():
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         for args in calls_nodisk:
-            futures.append(executor.submit(task, *args))
+            print('Scheduling', args[0])
+            futures.append([args[0], executor.submit(task, *args)])
+
+        print()
 
         # Start one thread that uses the disk and wait for that.
         for args in calls_disk:
+            print('Running', args[0])
             task(*args)
 
+        print()
 
-    for future in futures:
-        print(future.result())
+        for command, future in futures:
+            print(future.result())
+            print()
 
 def save_data(data):
     """
