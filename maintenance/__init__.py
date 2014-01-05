@@ -57,7 +57,12 @@ def task(command, attributes, options, data):
                 data[task] = {}
             data[task]["last"] = str(datetime.datetime.now())
 
-    return '\n'.join([str(x) for x in output_list])
+    output = '\n'.join([str(x) for x in output_list])
+    output = output.strip()
+    if len(output) == 0:
+        return termcolor.colored('(none)', 'yellow', attrs=['bold'])
+    else:
+        return output
 
 def orgoutput(*words):
     termcolor.cprint(' '.join(words), 'white', attrs=['bold'])
