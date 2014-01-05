@@ -4,15 +4,16 @@
 # Copyright © 2012-2014 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
+import concurrent
 import datetime
 import dateutil.parser
 import glob
 import json
 import os
 import os.path
+import pkg_resources
 import prettytable
 import subprocess
-import pkg_resources
 import sys
 import time
 import yaml
@@ -108,7 +109,7 @@ def main():
 
     futures = []
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         for args in calls_nodisk:
             futures.append(executor.submit(task, *args))
 
