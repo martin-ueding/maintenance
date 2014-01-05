@@ -15,9 +15,9 @@ import pkg_resources
 import prettytable
 import subprocess
 import sys
+import termcolor
 import time
 import yaml
-import termcolor
 
 
 __docformat__ = "restructuredtext en"
