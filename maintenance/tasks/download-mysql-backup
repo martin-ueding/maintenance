@@ -1,9 +1,9 @@
 #!/bin/bash
-# Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2013-2014 Martin Ueding <dev@martin-ueding.de>
 
 set -e
 set -u
 
 rsync -avhE chaos:Backup/*.sql.gz ~/Backup/chaos/
 
-ssh chaos rm "Backup/*.sql.gz"
+ssh chaos rm -f "Backup/*.sql.gz"
