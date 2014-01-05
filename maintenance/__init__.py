@@ -107,16 +107,19 @@ def main():
     tasks = sorted([call[0] for call in calls_disk + calls_nodisk])
     for line in ["- {}".format(task) for task in tasks]:
         print(line)
-    print()
 
     futures = []
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        if len(calls_nodisk) > 0:
+            print()
+
         for args in calls_nodisk:
             print('Scheduling', args[0])
             futures.append([args[0], executor.submit(task, *args)])
 
-        print()
+        if len(calls_disk) > 0:
+            print()
 
         # Start one thread that uses the disk and wait for that.
         for args in calls_disk:
@@ -124,9 +127,11 @@ def main():
             task(*args)
             save_data(data)
 
-        print()
+        if len(futures) > 0:
+            print()
 
         for command, future in futures:
+            print('Result for', command)
             print(future.result())
             print()
 
