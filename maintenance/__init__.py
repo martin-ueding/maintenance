@@ -29,12 +29,13 @@ statusfile = os.path.expanduser("~/.local/share/maintenance.js")
 def task(command, attributes, options, data):
     task = os.path.basename(command)
     run = True
+    output_list = []
 
     internet, power = pre_check()
 
     if (attributes['internet'] and not internet) or options.f:
         run = False
-        print("Aborting this task. You can use “-f” to run it anyway.")
+        output_list.append("Aborting this task. You can use “-f” to run it anyway.")
 
     taskname = os.path.join('tasks', command)
     if pkg_resources.resource_exists(__name__, taskname):
@@ -42,29 +43,24 @@ def task(command, attributes, options, data):
     else:
         syscommand = command
 
-    output = None
 
     if run and not options.dry:
         try:
             if attributes['disk']:
                 subprocess.check_call([syscommand], stderr=subprocess.STDOUT)
             else:
-                output = subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode()
+                output_list.append(subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode())
         except subprocess.CalledProcessError as e:
-            print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
-            print(e)
-            if attributes['disk']:
-                print_lock.release()
+            output_list.append(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+            output_list.append(e)
         except OSError as e:
-            print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
-            if attributes['disk']:
-                print_lock.release()
+            output_list.append(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
         else:
             if not task in data:
                 data[task] = {}
             data[task]["last"] = str(datetime.datetime.now())
 
-    return output
+    return '\n'.join([str(x) for x in output_list])
 
 def main():
     options = _parse_args()
