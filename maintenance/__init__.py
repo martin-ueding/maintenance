@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2014 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import datetime
@@ -14,7 +14,6 @@ import prettytable
 import subprocess
 import pkg_resources
 import sys
-import threading
 import time
 import yaml
 
@@ -25,145 +24,44 @@ __docformat__ = "restructuredtext en"
 _c = colorcodes.Colorcodes()
 
 statusfile = os.path.expanduser("~/.local/share/maintenance.js")
-save_data_lock = threading.Lock()
-print_lock = threading.Lock()
 
-all_threads = []
+def task(command, attributes, options, data):
+    task = os.path.basename(self.command)
+    run = True
 
-def print_block(lines):
-    with print_lock:
-        print()
-        for line in lines:
-            print(line)
+    internet, power = pre_check()
 
-class Task(threading.Thread):
-    def __init__(self, command, attributes, options, data):
-        """
-        :param command: Command to run.
-        :type command: str
-        :param attributes: Attributes of this task.
-        :type attributes: dict
-        :param dry: Whether to only print command.
-        :type dry: bool
-        """
-        super().__init__()
-        self.command = command
-        self.attributes = attributes
-        self.options = options
-        self.data = data
-        self.done = False
-        self.output = []
+    if (self.attributes['internet'] and not internet) or self.options.f:
+        run = False
+        self.print("Aborting this task. You can use “-f” to run it anyway.")
 
-    def print(self, line):
-        if self.attributes['disk']:
-            print(line)
-        else:
-            self.output.append(line)
+    taskname = os.path.join('tasks', self.command)
+    if pkg_resources.resource_exists(__name__, taskname):
+        syscommand = pkg_resources.resource_filename(__name__, taskname)
+    else:
+        syscommand = self.command
 
-    def flush(self):
-        if len(self.output) == 0:
-            return
-
-        with print_lock:
-            for line in self.output:
-                print(line)
-
-    def run(self):
-        """
-        Performs a single task.
-        """
-        task = os.path.basename(self.command)
-        run = True
-
-        if self.attributes['disk']:
-            print_lock.acquire()
-
-        self.print(_c.bold + task + _c.reset)
-        self.print(_c.bold + ("="*len(task)) + _c.reset)
-        self.print("")
-
-        internet, power = pre_check()
-
-        if (self.attributes['internet'] and not internet) or self.options.f:
-            run = False
-            self.print("Aborting this task. You can use “-f” to run it anyway.")
-
-        taskname = os.path.join('tasks', self.command)
-        if pkg_resources.resource_exists(__name__, taskname):
-            syscommand = pkg_resources.resource_filename(__name__, taskname)
-        else:
-            syscommand = self.command
-
-        if run and not self.options.dry:
-            # If this is a disk heavy task, show the output right away.
-            try:
-                if self.attributes['disk']:
-                    subprocess.check_call([syscommand])
-                else:
-                    output = subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode()
-                    if len(output.strip()) == 0:
-                        self.print("(no output)")
-                    else:
-                        self.print(output)
-            except subprocess.CalledProcessError as e:
-                self.print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
-                self.print(e)
-                if self.attributes['disk']:
-                    print_lock.release()
-            except OSError as e:
-                self.print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
-                if self.attributes['disk']:
-                    print_lock.release()
+    if run and not self.options.dry:
+        try:
+            if self.attributes['disk']:
+                subprocess.check_call([syscommand], stderr=subprocess.STDOUT)
             else:
-                if save_data_lock.acquire():
-                    if not task in self.data:
-                        self.data[task] = {}
-                    self.data[task]["last"] = str(datetime.datetime.now())
-                    save_data(self.data)
-                    save_data_lock.release()
-                else:
-                    self.print("Error locking!")
-
-        self.done = True
-
-        self.print("")
-
-        if self.attributes['disk']:
-            print_running_tasks(without=self)
-            print_lock.release()
+                output = subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode()
+        except subprocess.CalledProcessError as e:
+            self.print(_c.red + "Error in {command}:".format(command=syscommand) + _c.reset)
+            self.print(e)
+            if self.attributes['disk']:
+                print_lock.release()
+        except OSError as e:
+            self.print(_c.red + "Could not execute {command}.".format(command=syscommand) + _c.reset)
+            if self.attributes['disk']:
+                print_lock.release()
         else:
-            self.flush()
+            if not task in self.data:
+                self.data[task] = {}
+            self.data[task]["last"] = str(datetime.datetime.now())
 
-def print_tasks(tasks):
-    fields = list(list(tasks.items())[0][1].keys())
-    table = prettytable.PrettyTable(['command'] + fields)
-    table.align = 'l'
-    table.align['interval'] = 'r'
-    for command, task in sorted(tasks.items()):
-        table.add_row([command] + list(task.values()))
-
-    print(table)
-
-def print_running_tasks(without=None):
-    alive = []
-    waiting = []
-
-    for thread in all_threads:
-        if thread.is_alive() and thread is not without:
-            alive.append(thread.command)
-        elif not thread.done:
-            waiting.append(thread.command)
-
-    lines = []
-
-    if len(alive) > 0:
-        lines.append(_c.green + "Running: " + ", ".join(sorted(alive)) + _c.reset)
-    if len(waiting) > 0:
-        lines.append(_c.orange + "Waiting: " + ", ".join(sorted(waiting)) + _c.reset)
-
-    output = "\n".join(lines)
-    print(output)
-    print()
+    return output
 
 def main():
     options = _parse_args()
@@ -177,8 +75,8 @@ def main():
         with open(statusfile) as f:
             data = json.load(f)
 
-    threads_disk = []
-    threads_nodisk = []
+    calls_disk = []
+    calls_nodisk = []
     for command, attributes in tasks.items():
         needs = True
 
@@ -196,37 +94,31 @@ def main():
         if not needs:
             continue
 
-        thread = Task(command, attributes, options, data) 
         if attributes['disk']:
-            threads_disk.append(thread)
+            calls_disk.append([command, attributes, options, data])
         else:
-            threads_nodisk.append(thread)
+            calls_nodisk.append([command, attributes, options, data])
 
     print("Tasks that are done this session:")
     print()
-    tasks = sorted([thread.command for thread in threads_disk + threads_nodisk])
+    tasks = sorted([call[0] for call in calls_disk + calls_nodisk])
     for line in ["- {}".format(task) for task in tasks]:
         print(line)
     print()
 
-    global all_threads
-    all_threads = threads_disk + threads_nodisk
+    futures = []
 
-    # Start all the threads that do not use the disk very much.
-    for thread in threads_nodisk:
-        thread.start()
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        for args in calls_nodisk:
+            futures.append(executor.submit(task, *args))
 
-    print_running_tasks()
+        # Start one thread that uses the disk and wait for that.
+        for args in calls_disk:
+            task(*args)
 
-    # Start one thread that uses the disk and wait for that.
-    for thread in threads_disk:
-        thread.start()
-        thread.join()
 
-    # Wait for all other threads. I guess that they will have finished by then
-    # anyway.
-    for thread in threads_nodisk:
-        thread.join()
+    for future in futures:
+        print(future.result())
 
 def save_data(data):
     """
