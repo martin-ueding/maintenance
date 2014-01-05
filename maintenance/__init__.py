@@ -42,6 +42,8 @@ def task(command, attributes, options, data):
     else:
         syscommand = command
 
+    output = None
+
     if run and not options.dry:
         try:
             if attributes['disk']:
@@ -78,7 +80,7 @@ def main():
 
     calls_disk = []
     calls_nodisk = []
-    for command, attributes in tasks.items():
+    for command, attributes in sorted(tasks.items()):
         needs = True
 
         if command in data:
@@ -120,12 +122,15 @@ def main():
         for args in calls_disk:
             print('Running', args[0])
             task(*args)
+            save_data(data)
 
         print()
 
         for command, future in futures:
             print(future.result())
             print()
+
+        save_data(data)
 
 def save_data(data):
     """
