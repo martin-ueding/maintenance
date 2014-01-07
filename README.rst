@@ -1,4 +1,4 @@
-.. Copyright © 2013 Martin Ueding <dev@martin-ueding.de>
+.. Copyright © 2013-2014 Martin Ueding <dev@martin-ueding.de>
 
 ###########
 maintenance
@@ -21,4 +21,5 @@ Depenencies
 - bash
 - python3
 - python3-setuptools
+- python3-termcolor
 - python3-yaml
