@@ -8,31 +8,16 @@ backup-status:
   internet: true
   interval: 0.5
   local: false
-compress-tarball:
-  disk: true
-  internet: false
-  interval: 90
-  local: false
 copy-korrigiert:
   disk: false
   internet: true
   interval: 7
-  local: false
-ctags:
-  disk: true
-  internet: false
-  interval: 3
   local: false
 download-mysql-backup:
   disk: false
   internet: true
   interval: 1
   local: false
-dsstore:
-  disk: true
-  internet: false
-  interval: 90
-  local: true
 flash-cookies:
   disk: false
   internet: false
@@ -79,7 +64,7 @@ lesshst:
   interval: 1
   local: true
 mp3-packer:
-  disk: false
+  disk: true
   internet: false
   interval: 5
   local: false
@@ -138,11 +123,6 @@ unison-cleanup:
   internet: false
   interval: 30
   local: true
-vimrc:
-  disk: true
-  internet: true
-  interval: 1
-  local: false
 virus-scan-Backup:
   disk: true
   internet: false
