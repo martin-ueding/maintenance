@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.10
+    - Disable some tasks
+
 v1.9
     - Use futures instead of manual multithreading
     - *virus-scan-Packaging*: Fix virus scan of packaging material
