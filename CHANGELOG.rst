@@ -4,6 +4,10 @@
 Changelog
 #########
 
+v1.10.1
+    - Remove “Scheduling …” output
+    - *thumbnails*: Keep thumbnails longer
+
 v1.10
     - Disable some tasks
 
