@@ -116,7 +116,6 @@ def main():
             print()
 
         for args in calls_nodisk:
-            orgoutput('Scheduling', args[0])
             futures.append([args[0], executor.submit(task, *args)])
 
         for args in calls_disk:
