@@ -112,9 +112,6 @@ def main():
     futures = []
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        if len(calls_nodisk) > 0:
-            print()
-
         for args in calls_nodisk:
             futures.append([args[0], executor.submit(task, *args)])
 
