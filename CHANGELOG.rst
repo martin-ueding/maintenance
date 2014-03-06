@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.10.2
+    - Remove stray newline
+
 v1.10.1
     - Remove “Scheduling …” output
     - *thumbnails*: Keep thumbnails longer
