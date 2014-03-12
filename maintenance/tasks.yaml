@@ -8,6 +8,16 @@ backup-status:
   internet: true
   interval: 0.5
   local: false
+comic-rss-crawler:
+  disk: false
+  internet: true
+  interval: 1
+  local: false
+comic-rss-rss:
+  disk: false
+  internet: false
+  interval: 1
+  local: false
 copy-korrigiert:
   disk: false
   internet: true
