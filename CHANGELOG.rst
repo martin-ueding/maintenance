@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.10.3
+    - Add new tasks
+
 v1.10.2
     - Remove stray newline
 
