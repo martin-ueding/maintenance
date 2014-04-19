@@ -4,6 +4,9 @@
 Changelog
 #########
 
+v1.10.4
+    - Change tasks
+
 v1.10.3
     - Add new tasks
 
