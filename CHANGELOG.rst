@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.10.5
+    2014-04-23
+
+    - Change tasks
+
 v1.10.4
     - Change tasks
 
