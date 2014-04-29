@@ -4,8 +4,15 @@
 Changelog
 #########
 
+v1.11
+    Released: 2014-04-29
+
+    - Move list of tasks into a config file that lives in
+      ``~/.config/maintenance`` so that changing the tasks do not need a
+      release (and repackaging).
+
 v1.10.5
-    2014-04-23
+    Released: 2014-04-23
 
     - Change tasks
 
