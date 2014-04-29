@@ -6,17 +6,18 @@
 import argparse
 import concurrent.futures
 import datetime
-import dateutil.parser
 import glob
 import json
 import os
 import os.path
-import pkg_resources
-import prettytable
 import subprocess
 import sys
-import termcolor
 import time
+
+import dateutil.parser
+import pkg_resources
+import prettytable
+import termcolor
 import yaml
 
 
