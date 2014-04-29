@@ -5,6 +5,7 @@
 
 import argparse
 import concurrent.futures
+import configparser
 import datetime
 import glob
 import json
@@ -18,7 +19,6 @@ import dateutil.parser
 import pkg_resources
 import prettytable
 import termcolor
-import yaml
 
 
 __docformat__ = "restructuredtext en"
@@ -32,7 +32,7 @@ def task(command, attributes, options, data):
 
     internet, power = pre_check()
 
-    if (attributes['internet'] and not internet) or options.f:
+    if (attributes.getboolean('internet') and not internet) or options.f:
         run = False
         output_list.append("Aborting this task. You can use “-f” to run it anyway.")
 
@@ -44,7 +44,7 @@ def task(command, attributes, options, data):
 
     if run and not options.dry:
         try:
-            if attributes['disk']:
+            if attributes.getboolean('disk'):
                 subprocess.check_call([syscommand], stderr=subprocess.STDOUT)
             else:
                 output_list.append(subprocess.check_output([syscommand], stderr=subprocess.STDOUT).decode())
@@ -71,9 +71,9 @@ def orgoutput(*words):
 def main():
     options = _parse_args()
 
-    taskfile = 'tasks.yaml'
-    tasks = {}
-    tasks = yaml.load(pkg_resources.resource_stream(__name__, taskfile))
+    taskfile = os.path.expanduser('~/.config/maintenance/tasks.ini')
+    tasks = configparser.ConfigParser()
+    tasks.read(taskfile)
 
     data = {}
     if os.path.isfile(statusfile):
@@ -82,15 +82,15 @@ def main():
 
     calls_disk = []
     calls_nodisk = []
-    for command, attributes in sorted(tasks.items()):
+    for command in sorted(tasks.sections()):
         needs = True
 
         if command in data:
             diff = datetime.datetime.now() - dateutil.parser.parse(data[command]["last"])
-            if diff < datetime.timedelta(attributes['interval']):
+            if diff < datetime.timedelta(float(tasks[command]['interval'])):
                 needs = False
 
-        if options.local and not attributes["local"]:
+        if options.local and not tasks[command].getboolean("local"):
             needs = False
 
         if len(options.tasks) > 0:
@@ -99,10 +99,10 @@ def main():
         if not needs:
             continue
 
-        if attributes['disk']:
-            calls_disk.append([command, attributes, options, data])
+        if tasks[command].getboolean('disk'):
+            calls_disk.append([command, tasks[command], options, data])
         else:
-            calls_nodisk.append([command, attributes, options, data])
+            calls_nodisk.append([command, tasks[command], options, data])
 
     orgoutput("Tasks that are done this session:")
     print()
