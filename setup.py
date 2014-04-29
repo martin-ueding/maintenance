@@ -18,6 +18,6 @@ setup(
         'my-clamscan',
     ],
     package_data={
-        'maintenance': ['*.yaml', 'tasks/*'],
+        'maintenance': ['tasks/*'],
     },
 )
