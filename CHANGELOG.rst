@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.11.1
+    Released: 2014-05-26
+
+    - *virus-scan-Branches*: Fix folder name
+
 v1.11
     Released: 2014-04-29
 
