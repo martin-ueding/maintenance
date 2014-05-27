@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.11.2
+    Released:
+
+    - Delete *backup-chaos* since that is a standalone program now
+
 v1.11.1
     Released: 2014-05-26
 
