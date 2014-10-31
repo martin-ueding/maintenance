@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.12
+    Released: 2014-10-31
+
+    - Add ``--ssd`` command line switch to execute everything in parallel.
+
 v1.11.2
     Released:
 
