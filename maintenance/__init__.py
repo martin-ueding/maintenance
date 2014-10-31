@@ -99,7 +99,7 @@ def main():
         if not needs:
             continue
 
-        if tasks[command].getboolean('disk'):
+        if tasks[command].getboolean('disk') and not options.ssd:
             calls_disk.append([command, tasks[command], options, data])
         else:
             calls_nodisk.append([command, tasks[command], options, data])
@@ -174,6 +174,7 @@ def _parse_args():
     parser.add_argument("-n", action="store_true", dest="dry", default=False, help="Dry run, only show what would be done.")
     parser.add_argument("-f", action="store_true", help="Run even without power and internet connection.")
     parser.add_argument("--local", action="store_true", help="Run only local tasks.")
+    parser.add_argument("--ssd", action="store_true", help="Run everything in parallel.")
 
     return parser.parse_args()
 
