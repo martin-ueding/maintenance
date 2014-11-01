@@ -99,7 +99,10 @@ def main():
         if not needs:
             continue
 
-        if tasks[command].getboolean('disk') and not options.ssd:
+        if options.ssd:
+            tasks[command]['disk'] = 'false'
+
+        if tasks[command].getboolean('disk'):
             calls_disk.append([command, tasks[command], options, data])
         else:
             calls_nodisk.append([command, tasks[command], options, data])

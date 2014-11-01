@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.12.1
+    Released: 2014-11-01
+
+    - Prevent interleaving output when using the ``--ssd`` switch.
+
 v1.12
     Released: 2014-10-31
 
