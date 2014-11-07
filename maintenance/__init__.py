@@ -126,9 +126,10 @@ def main():
             save_data(data)
 
         for command, future in futures:
+            result = future.result()
             print()
             orgoutput('Result for', command)
-            print(future.result())
+            print(result)
 
         save_data(data)
 
