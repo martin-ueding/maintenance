@@ -4,6 +4,12 @@
 Changelog
 #########
 
+v1.12.2
+    Released: 2014-11-07
+
+    - Print headings after output is ready to prevent interleaving of stderr
+      messages.
+
 v1.12.1
     Released: 2014-11-01
 
