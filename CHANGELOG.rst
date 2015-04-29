@@ -1,8 +1,13 @@
-.. Copyright © 2013-2014 Martin Ueding <dev@martin-ueding.de>
+.. Copyright © 2013-2015 Martin Ueding <dev@martin-ueding.de>
 
 #########
 Changelog
 #########
+
+v1.12.3
+    Released: 2015-04-29
+
+    - Add script to delete Ansible retry files.
 
 v1.12.2
     Released: 2014-11-07
