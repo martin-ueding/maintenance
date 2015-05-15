@@ -4,6 +4,11 @@
 Changelog
 #########
 
+v1.12.4
+    Released: 2015-05-15
+
+    - Remove makefile since it only uses ``setup.py`` anyway.
+
 v1.12.3
     Released: 2015-04-29
 
